@@ -5,6 +5,8 @@ call .\batch\msvs-dev-env.bat
 cd ..
 
 if not exist build mkdir build
+if not exist output mkdir output
+
 cd build
 if(%1 == "Release") (
     @REM cmake .. --preset="x64-release"
@@ -16,7 +18,33 @@ if(%1 == "Release") (
     cmake --build . --config Debug
 )
 cd..
-ECHO ========================
+ECHO ======== START RUNNING =========
+ECHO ================================
 build\ATL.exe %*
+ECHO ================================
 
-@REM ml
+if exist .\output\*.exe del .\output\*.exe
+if exist .\output\*.obj del .\output\*.obj
+
+SET "OUTPUT="
+SET "INPUT="
+
+:Loop
+IF "%1" equ "" GOTO Continue
+IF "%1" equ "-o" (
+    SET "OUTPUT=%2"
+    GOTO Continue
+)
+SHIFT
+GOTO Loop
+:Continue
+
+.\nasm-2.16.02\nasm.exe -f win64 .\output\test.asm -o .\output\%OUTPUT%.obj
+.\Golink\GoLink.exe /console /entry main .\output\%OUTPUT%.obj kernel32.dll
+
+ECHO ======== START RUNNING =========
+ECHO ================================
+.\output\test.exe
+ECHO ================================
+
+endlocal

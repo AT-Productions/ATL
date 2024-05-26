@@ -17,6 +17,7 @@ ATL {OPTIONS | ARGUMENTS}\n\
 ARGUMENTS:\n\
     -i, --input             Input file(s), enclose in quotes for multiple files\n\
     -o, --output            Output file\n\
+    -m  --macro             Define macros (-m 'WINDOWS=TRUE')\n\
 \n\
 OPTIONS:\n\
     -h, --help              Display this information\n\

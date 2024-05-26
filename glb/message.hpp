@@ -11,5 +11,6 @@
 #define NO_OUTPUT               4
 #define REDEFINITION            5
 #define NO_INPUT_OUTPUT         6
+#define ERR_OPEN_FILE           7
 
 void message(int i_message, int i_fl_flag);

@@ -1,0 +1,24 @@
+macro       A       0x61
+import      t       "test2.atl"
+
+t.function
+
+struct abc {
+    int a
+    int b
+    string lol
+}
+
+void test(string arg, int arg2, char arg3) {
+    printe("LOL", arg, arg2, arg3)
+    exit(0)
+}
+
+int test2(){
+    print("HAHA")
+}
+
+if(1 == 1){
+    test("xaxaha", 1, 'a')
+} else
+    test2
