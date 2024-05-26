@@ -44,6 +44,9 @@ OPTIONS:\n\
     case NO_INPUT_OUTPUT:
         s_message = "No input or output file specified.";
         break;
+    case ERR_OPEN_FILE:
+        s_message = "Error opening file.";
+        break;
     }
 
     std::cout   << 
