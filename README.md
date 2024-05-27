@@ -1,1 +1,1 @@
-#1 rust, zig, c/c++, haskell competitor 
+#1 rust, zig, c/c++, haskell competitor

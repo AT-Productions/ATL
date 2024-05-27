@@ -13,7 +13,9 @@ void test(string arg, int arg2, char arg3) {
     printe("LOL", arg, arg2, arg3)
     exit(0)
 }
-
+case 1...10: break
+case default: break
+case all: break
 int test2(){
     print("HAHA")
 }

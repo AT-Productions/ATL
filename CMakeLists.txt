@@ -16,6 +16,8 @@ file(GLOB SOURCES
 "./*.hpp"
 "glb/*.cpp"
 "glb/*.hpp"
+"funcs/*.cpp"
+"funcs/*.hpp"
 )
 
 # Add executable and link with ATL library

@@ -3,8 +3,8 @@
 #include <string>
 #include <iostream>
 
-void message(int i_message = -1, int i_fl_flag = -1) {
-    std::string s_message = "EMPTY";
+void message(int i_message = -1, int i_fl_flag = -1, std::string sp_message = "") {
+    std::string s_message = "";
     int FL_FLAG = -1;
     switch (i_message) {
     case NO_ARGUMENTS:
@@ -47,16 +47,45 @@ OPTIONS:\n\
     case ERR_OPEN_FILE:
         s_message = "Error opening file.";
         break;
+    case ERR_READ_FILE:
+        s_message = "Error reading file.";
+        break;
+    case ERR_WRITE_FILE:
+        s_message = "Error writing file.";
+        break;
+    case ERR_CLOSE_FILE:
+        s_message = "Error closing file.";
+        break;
+    case MEMORY:
+        s_message = "Memory error.";
+        break;
+    case SYNTAX:
+        s_message = "Syntax error.";
+        break;
+    case INVALID_FILE:
+        s_message = "Invalid file.";
+        break;
+    default:    
+        s_message = "Unknown error.";
+        break;
     }
 
-    std::cout   << 
-    "%%%%%%%%%%%%%%%%%% ATL MESSAGE %%%%%%%%%%%%%%%%%%\n" <<
-    "MESSAGE CODE: " <<
-    "<"         <<
-    i_message   <<
-    "-"         <<
-    i_fl_flag   <<
-    ">\n"        <<
-    s_message   <<
+    std::cout                                               << 
+    "%%%%%%%%%%%%%%%%%% ATL MESSAGE %%%%%%%%%%%%%%%%%%\n"   <<
+    "MESSAGE CODE: "                                        <<
+    "<"                                                     <<
+    i_message                                               <<
+    "-"                                                     <<
+    i_fl_flag                                               <<
+    ">\n"                                                   <<
+    "MESSAGE: "                                             <<
+    s_message                                               <<
+    "\n"                                                    <<
+    (sp_message != "" ?
+        "GIVEN SP_MESSAGE: <"+sp_message+">"
+        : ""
+    )                                                       <<
+    "\n"                                                    <<
+    "%%%%%%%%%%%%%%%%%% END MESSAGE %%%%%%%%%%%%%%%%%%"     <<
     std::endl;
 }
