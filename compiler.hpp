@@ -21,7 +21,8 @@ enum Tokens {
     LITERAL,
     IDENTIFIER,
     COMMENT,
-    PREPROCESSOR
+    PREPROCESSOR,
+    WHITESPACE,
 };
 
 enum Keyword_Tokens {
@@ -42,9 +43,10 @@ enum Keyword_Tokens {
     KEYWORD_FUNCTION,       // function
     KEYWORD_STRUCT,         // struct
     KEYWORD_ENUM,           // enum
-    KEYWORD_IMPORT,         // include | import
-    KEYWORD_MACRO,          // define | macro
-    KEYWORD_COMPILER        // pragma
+    KEYWORD_IMPORT,         // include  | import
+    KEYWORD_MACRO,          // define   | macro
+    KEYWORD_COMPILER,       // compiler |pragma
+    KEYWORD_VOID            // void
 };
 
 enum Operator_Tokens {
@@ -118,6 +120,12 @@ enum Preprocessor_Tokens {
     PREPROCESSOR_COMPILER   // #pragma
 };
 
+enum Whitespace_Tokens {
+    WHITESPACE_SPACE,       // ' '    0x20
+    WHITESPACE_TAB,         // '\t'   0x09
+    WHITESPACE_NEWLINE,     // '\n'   0x0A
+    WHITESPACE_RETURN       // '\r'   0x0D
+};
 
 struct Token {
     Tokens type;
@@ -132,6 +140,7 @@ void syntaxanalysis(std::vector<Token> &tokens);
 
 
 
+// thanks to https://stackoverflow.com/a/217605
 // trim from start (in place)
 inline void ltrim(std::string &s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {

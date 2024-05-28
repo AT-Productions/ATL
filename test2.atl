@@ -1,6 +1,21 @@
-exit(12.1)
+macro       TEST        1
+compiler    DISABLE     10
+
+exit(1  .1)
 bool test = true
 int test = 1
 float test = 1.1
-string test = "abc"
-char test = 'a'
+string test = "abc\"lol"
+char char_test = '0x0D'
+char char_test = '\''
+
+struct TEST {
+    float margin
+    int amount
+}
+
+void test = () {}
+
+for(int index = 0; index < 100; index++){
+    print(index)
+}

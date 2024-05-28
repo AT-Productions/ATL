@@ -22,7 +22,7 @@
 #define ERR_WRITE_FILE          10
 #define ERR_CLOSE_FILE          11
 #define MEMORY                  12
-#define SYNTAX                  13
+#define TOKENIZER_SYNTAX        13
 #define INVALID_FILE            14
 
 void message(int i_message, int i_fl_flag, std::string sp_message);

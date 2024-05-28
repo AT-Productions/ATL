@@ -59,8 +59,8 @@ OPTIONS:\n\
     case MEMORY:
         s_message = "Memory error.";
         break;
-    case SYNTAX:
-        s_message = "Syntax error.";
+    case TOKENIZER_SYNTAX:
+        s_message = "Syntax error found during tokenization.";
         break;
     case INVALID_FILE:
         s_message = "Invalid file.";
