@@ -24,7 +24,10 @@ void test(string arg = "buffer"){}
 string troll = "loler"
 string troll = "lol\""
 char tee = '\''
-// These two cause errors
 
 print("kakka " + troll + " gagel")
 
+
+// These two cause errors
+
+1 / 2

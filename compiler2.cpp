@@ -139,8 +139,6 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
 
     bool in_block_comment = false; // /* */
     bool in_line_comment = false; // //
-    bool in_string = false; // ""
-    bool in_char = false; // ''
     bool expect_pass = false;
     char prev_char = '\0';
     char curr_char = '\0';
@@ -153,6 +151,27 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
             buffer += line[cur_ind];
             ltrim(buffer); // remove leading whitespace, don't see any issues for now :))))))))
             switch (line[cur_ind]){
+                case '/':
+                    if(look_ahead(cur_ind, line)[0] == '/'){
+                        buffer += '/';
+                        i_free_use = 0;
+                        // prev_char = '\0';
+                        // curr_char = '\0';
+                        while(true){
+                            buffer += look_ahead(cur_ind, line)[0];
+                            if(line.length() < cur_ind){
+                                std::cout << "Linelength: " << line.length() << " cur_ind: " << cur_ind << std::endl;
+                                break;
+                            }
+                        }
+                        std::cout << "buffer: '" << buffer << std::endl;
+                        tokens->push_back(Token(COMMENT, LINE_COMMENT, buffer));
+                        buffer = "";
+                        break;
+                    } else{
+                        // Else we must fall through to look for division operator
+                        cur_ind--;
+                    } 
                 case 0x0A:
                     tokens->push_back(Token(WHITESPACE, WHITESPACE_NEWLINE, "\n"));
                     break;
@@ -173,15 +192,12 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
                         if(i_free_use > 0 && curr_char == '"' && prev_char != '\\'
                             || line.length() < cur_ind
                         ){
-                            std::cout << "___buffer: '" << buffer << "' curr_char: '" << curr_char << "' prev_char: '" << prev_char << "'" << std::endl;
-                            std::cout << "___length: " << line.length() << " cur_ind: " << cur_ind << std::endl;
                             break;
                         }
                         buffer += line[cur_ind];
                         prev_char = line[cur_ind];
                         i_free_use++;
                     }
-                    std ::cout << "a___buffer: '" << buffer << "' curr_char: '" << curr_char << "' prev_char: '" << prev_char << "'" << std::endl;
                     if(curr_char == '"'){
                         buffer += '"';
                         tokens->push_back(Token(LITERAL, STRING_LITERAL, buffer));
@@ -236,7 +252,6 @@ Type: 2 Subtype: 4 Value: )
                     continue;
             default: // other
                 std::string look_next = look_ahead(cur_ind, line);
-                std::cout << "buffer: '" << buffer << "' look_next: '" << look_next << "'" << std::endl;
                 cur_ind--; // bad logic, will fix later
 
                 int i_check_separators = if_arr_contains(LOOK_FOR_SEPARATORS, buffer);
