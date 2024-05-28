@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 
-void message(int i_message = -1, int i_fl_flag = -1, std::string sp_message = "") {
+void message(int i_message = -1, int i_fl_flag = -1, std::string sp_message = "", bool fatal = false) {
     std::string s_message = "";
     int FL_FLAG = -1;
     switch (i_message) {
@@ -88,4 +88,6 @@ OPTIONS:\n\
     "\n"                                                    <<
     "%%%%%%%%%%%%%%%%%% END MESSAGE %%%%%%%%%%%%%%%%%%"     <<
     std::endl;
+
+    if(fatal) exit(i_message);
 }

@@ -21,6 +21,10 @@ for(int index = 0; index < 100; index++){
 }
 void test(string arg = "buffer"){}
 
-string troll = "lol"
+string troll = "loler"
+string troll = "lol\""
+char tee = '\''
+// These two cause errors
+
 print("kakka " + troll + " gagel")
 

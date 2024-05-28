@@ -130,8 +130,7 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
     // Read file line by line, char by char
     std::ifstream file(s_arguments[INPUT], std::ios::binary);
     if (!file.is_open()) {
-        message(ERR_OPEN_FILE, FL_compiler2, s_arguments[INPUT]);
-        exit(ERR_OPEN_FILE);
+        message(ERR_OPEN_FILE, FL_compiler2, s_arguments[INPUT], true);
     }
 
     std::string line;
@@ -160,35 +159,40 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
                 case 0x0D:
                     tokens->push_back(Token(WHITESPACE, WHITESPACE_RETURN, "\r"));
                     break;
-                case 0x09:
-                    tokens->push_back(Token(WHITESPACE, WHITESPACE_TAB, "\t"));
-                    break;
+                // case 0x09:
+                //     tokens->push_back(Token(WHITESPACE, WHITESPACE_TAB, "\t"));
+                //     break;
                 case '"': 
                     // string
                     // might do a better version of this later with logic in while loop
                     i_free_use = 0;
                     prev_char = '\0';
+                    curr_char = '\0';
                     while(true){
                         curr_char = look_ahead(cur_ind, line)[0];
-                        if(i_free_use > 0 && curr_char == '"' && prev_char != '\\'){
+                        if(i_free_use > 0 && curr_char == '"' && prev_char != '\\'
+                            || line.length() < cur_ind
+                        ){
+                            std::cout << "___buffer: '" << buffer << "' curr_char: '" << curr_char << "' prev_char: '" << prev_char << "'" << std::endl;
+                            std::cout << "___length: " << line.length() << " cur_ind: " << cur_ind << std::endl;
                             break;
                         }
                         buffer += line[cur_ind];
                         prev_char = line[cur_ind];
                         i_free_use++;
                     }
+                    std ::cout << "a___buffer: '" << buffer << "' curr_char: '" << curr_char << "' prev_char: '" << prev_char << "'" << std::endl;
                     if(curr_char == '"'){
                         buffer += '"';
                         tokens->push_back(Token(LITERAL, STRING_LITERAL, buffer));
                         cur_ind++;
                     } else {
-                        message(TOKENIZER_SYNTAX, FL_compiler2, "String not closed at row: " + std::to_string(line_num) + " @ " + std::to_string(line_pos));
-                        exit(TOKENIZER_SYNTAX);
+                        message(TOKENIZER_SYNTAX, FL_compiler2, "String not closed at row: " + std::to_string(line_num) + " @ " + std::to_string(line_pos) + " - " + buffer, true);
                     }
                     buffer = "";
 
                     /*+++
-                    reason:
+                    reason for decrement:
                     print('"')
                     without:
 Type: 2 Subtype: 3 Value: print
@@ -201,7 +205,8 @@ Type: 2 Subtype: 3 Value: (
 Type: 3 Subtype: 3 Value: '"'
 Type: 2 Subtype: 4 Value: )
 
-                    -might- cause problems later
+                    ~might~ cause problems later
+                    same for char
                     ---*/
                     cur_ind--;
                     continue;
@@ -210,7 +215,9 @@ Type: 2 Subtype: 4 Value: )
                     prev_char = '\0';
                     while(true){
                         curr_char = look_ahead(cur_ind, line)[0];
-                        if(i_free_use > 0 && curr_char == '\'' && prev_char != '\\'){
+                        if(i_free_use > 0 && curr_char == '\'' && prev_char != '\\'
+                            || line.length() < cur_ind
+                        ){
                             break;
                         }
                         buffer += line[cur_ind];
@@ -222,8 +229,7 @@ Type: 2 Subtype: 4 Value: )
                         tokens->push_back(Token(LITERAL, CHAR_LITERAL, buffer));
                         cur_ind++;
                     } else {
-                        message(TOKENIZER_SYNTAX, FL_compiler2, "Char not closed at row: " + std::to_string(line_num) + " @ " + std::to_string(line_pos));
-                        exit(TOKENIZER_SYNTAX);
+                        message(TOKENIZER_SYNTAX, FL_compiler2, "Char not closed at row: " + std::to_string(line_num) + " @ " + std::to_string(line_pos) + " - " + buffer, true);
                     }
                     buffer = "";
                     cur_ind--;
@@ -372,8 +378,8 @@ switch (x){
     "check_separators " + buffer + " at row: " 
     + std::to_string(line_num) + " @ " + std::to_string(line_pos) +
     " - code: " + std::to_string(x) + " not found in operators list."
-    ); 
-    exit(TOKENIZER_SYNTAX);}
+    , true);
+}
 }
 void check_operators(int x, std::vector<Token> *tokens, std::string &buffer) {
     if(buffer == "") return;
@@ -408,10 +414,10 @@ switch (x){
     "check_operators " + buffer + " at row: " 
     + std::to_string(line_num) + " @ " + std::to_string(line_pos) +
     " - code: " + std::to_string(x) + " not found in operators list."
-    ); 
-    exit(TOKENIZER_SYNTAX);
+    , true);
+    }
 }
-}
+
 void check_keywords(int x, std::vector<Token> *tokens, std::string &buffer) {
     if(buffer == "") return;
 // will improve this later
@@ -442,8 +448,8 @@ switch (x){
     "check_keywords " + buffer + " at row: " 
     + std::to_string(line_num) + " @ " + std::to_string(line_pos) +
     " - code: " + std::to_string(x) + " not found in operators list."
-    ); 
-    exit(TOKENIZER_SYNTAX);}
+    , true);
+}
 }
 void check_preprocessor(int x, std::vector<Token> *tokens, std::string &buffer){
     if(buffer == "") return;
@@ -456,7 +462,7 @@ switch (x){
     "check_preprocessor " + buffer + " at row: " 
     + std::to_string(line_num) + " @ " + std::to_string(line_pos) +
     " - code: " + std::to_string(x) + " not found in operators list."
-    ); 
-    exit(TOKENIZER_SYNTAX);}
+    , true);
+}
 }
 

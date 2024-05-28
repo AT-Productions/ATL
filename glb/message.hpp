@@ -25,4 +25,4 @@
 #define TOKENIZER_SYNTAX        13
 #define INVALID_FILE            14
 
-void message(int i_message, int i_fl_flag, std::string sp_message);
+void message(int i_message, int i_fl_flag, std::string sp_message, bool fatal);
