@@ -14,8 +14,13 @@ struct TEST {
     int amount
 }
 
-void test = () {}
+void test() {}
 
 for(int index = 0; index < 100; index++){
     print(index)
 }
+void test(string arg = "buffer"){}
+
+string troll = "lol"
+print("kakka " + troll + " gagel")
+

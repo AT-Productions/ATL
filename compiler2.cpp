@@ -146,67 +146,95 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
     char prev_char = '\0';
     char curr_char = '\0';
     int i_free_use = 0;
+    std::string test;
     while (std::getline(file, line)) {
         line_num++;
-        for(uint16_t cur_ind = 0; cur_ind < line.length(); cur_ind++){
+        for(uint16_t cur_ind = 0; cur_ind <= line.length(); cur_ind++){
             line_pos++;
             buffer += line[cur_ind];
             ltrim(buffer); // remove leading whitespace, don't see any issues for now :))))))))
             switch (line[cur_ind]){
-            case '"': // string
-                // might do a better version of this later with logic in while loop
-                i_free_use = 0;
-                prev_char = '\0';
-                while(true){
-                    curr_char = look_ahead(cur_ind, line)[0];
-                    if(i_free_use > 0 && curr_char == '"' && prev_char != '\\'){
-                        break;
+                case 0x0A:
+                    tokens->push_back(Token(WHITESPACE, WHITESPACE_NEWLINE, "\n"));
+                    break;
+                case 0x0D:
+                    tokens->push_back(Token(WHITESPACE, WHITESPACE_RETURN, "\r"));
+                    break;
+                case 0x09:
+                    tokens->push_back(Token(WHITESPACE, WHITESPACE_TAB, "\t"));
+                    break;
+                case '"': 
+                    // string
+                    // might do a better version of this later with logic in while loop
+                    i_free_use = 0;
+                    prev_char = '\0';
+                    while(true){
+                        curr_char = look_ahead(cur_ind, line)[0];
+                        if(i_free_use > 0 && curr_char == '"' && prev_char != '\\'){
+                            break;
+                        }
+                        buffer += line[cur_ind];
+                        prev_char = line[cur_ind];
+                        i_free_use++;
                     }
-                    buffer += line[cur_ind];
-                    prev_char = line[cur_ind];
-                    i_free_use++;
-                }
-                if(curr_char == '"'){
-                    buffer += '"';
-                    tokens->push_back(Token(LITERAL, STRING_LITERAL, buffer));
-                    cur_ind++;
-                } else {
-                    message(TOKENIZER_SYNTAX, FL_compiler2, "String not closed at row: " + std::to_string(line_num) + " @ " + std::to_string(line_pos));
-                    exit(TOKENIZER_SYNTAX);
-                }
-                buffer = "";
-                break;
-            case '\'': // char
-                i_free_use = 0;
-                prev_char = '\0';
-                while(true){
-                    curr_char = look_ahead(cur_ind, line)[0];
-                    if(i_free_use > 0 && curr_char == '\'' && prev_char != '\\'){
-                        break;
+                    if(curr_char == '"'){
+                        buffer += '"';
+                        tokens->push_back(Token(LITERAL, STRING_LITERAL, buffer));
+                        cur_ind++;
+                    } else {
+                        message(TOKENIZER_SYNTAX, FL_compiler2, "String not closed at row: " + std::to_string(line_num) + " @ " + std::to_string(line_pos));
+                        exit(TOKENIZER_SYNTAX);
                     }
-                    buffer += line[cur_ind];
-                    prev_char = line[cur_ind];
-                    i_free_use++;
-                }
-                if(curr_char == '\''){
-                    buffer += '\'';
-                    tokens->push_back(Token(LITERAL, CHAR_LITERAL, buffer));
-                    cur_ind++;
-                } else {
-                    message(TOKENIZER_SYNTAX, FL_compiler2, "Char not closed at row: " + std::to_string(line_num) + " @ " + std::to_string(line_pos));
-                    exit(TOKENIZER_SYNTAX);
-                }
-                std::cout << "CHAR: " << buffer << std::endl;
-                buffer = "";
-                break;
+                    buffer = "";
+
+                    /*+++
+                    reason:
+                    print('"')
+                    without:
+Type: 2 Subtype: 3 Value: print
+Type: 2 Subtype: 3 Value: (
+Type: 3 Subtype: 3 Value: '"'
+Missing the closing quote
+                    with:
+Type: 2 Subtype: 3 Value: print
+Type: 2 Subtype: 3 Value: (
+Type: 3 Subtype: 3 Value: '"'
+Type: 2 Subtype: 4 Value: )
+
+                    -might- cause problems later
+                    ---*/
+                    cur_ind--;
+                    continue;
+                case '\'': // char
+                    i_free_use = 0;
+                    prev_char = '\0';
+                    while(true){
+                        curr_char = look_ahead(cur_ind, line)[0];
+                        if(i_free_use > 0 && curr_char == '\'' && prev_char != '\\'){
+                            break;
+                        }
+                        buffer += line[cur_ind];
+                        prev_char = line[cur_ind];
+                        i_free_use++;
+                    }
+                    if(curr_char == '\''){
+                        buffer += '\'';
+                        tokens->push_back(Token(LITERAL, CHAR_LITERAL, buffer));
+                        cur_ind++;
+                    } else {
+                        message(TOKENIZER_SYNTAX, FL_compiler2, "Char not closed at row: " + std::to_string(line_num) + " @ " + std::to_string(line_pos));
+                        exit(TOKENIZER_SYNTAX);
+                    }
+                    buffer = "";
+                    cur_ind--;
+                    continue;
             default: // other
                 std::string look_next = look_ahead(cur_ind, line);
-                
+                std::cout << "buffer: '" << buffer << "' look_next: '" << look_next << "'" << std::endl;
                 cur_ind--; // bad logic, will fix later
 
-
                 int i_check_separators = if_arr_contains(LOOK_FOR_SEPARATORS, buffer);
-                if(i_check_separators != -1 && (look_next[0] == 0x0A || look_next[0] == 0x0D || look_next[0] == 0x09)){
+                if(i_check_separators != -1){
                     check_separators(i_check_separators, tokens, buffer);
                     buffer = "";
                     continue;
@@ -255,7 +283,6 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
                 
                 look_next = look_ahead(cur_ind, line);
                 cur_ind--; // bad logic, will fix later
-                std::cout << std::endl;
                 if(look_next[0] == 0x20 || look_next[0] == 0x0A || look_next[0] == 0x0D || look_next[0] == 0x09){
                     /*+++
                     // buffer can add '' items, more work for syntax analyzer
@@ -283,8 +310,6 @@ struct TEST {
                     ---*/
                     // IDENTIFIER_UNKNOWN is a placeholder for now, explained in compiler.hpp
                     if(buffer[0] != 0x0){
-                        std::cout << "OUTSIDE buffer: '" << buffer << "' look_next: '" << uint16_t(look_next[0]) << "'" << std::endl;
-                        std::cout << "INSIDE buffer: '" << buffer << "' look_next: '" << uint16_t(buffer[0]) << "'" << std::endl;
                         tokens->push_back(Token(IDENTIFIER, IDENTIFIER_UNKNOWN, buffer));
                     }
                     buffer = "";
@@ -299,6 +324,8 @@ struct TEST {
                     buffer = "";
                     continue;
                 }
+
+
                 int check_separators_next = if_arr_contains(LOOK_FOR_SEPARATORS, look_next);
                 if(check_separators_next != -1){
                     check_separators(check_separators_next, tokens, buffer);

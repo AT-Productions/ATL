@@ -6,6 +6,7 @@
 
 void syntaxanalysis(std::vector<Token> &tokens) {
     for(auto &token : tokens){
-        std::cout << "Type: '" << token.type << "' Subtype: '" << token.subtype << "' Value: '" << token.value << "'" << std::endl;
+        // std::cout << "Type: '" << token.type << "' Subtype: '" << token.subtype << "' Value: '" << token.value << "'" << std::endl;
+        std::cout << "Type: " << token.type << " Subtype: " << token.subtype << " Value: " << token.value << "" << std::endl;
     }
 }
