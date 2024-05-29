@@ -4,6 +4,3 @@ call .\globals.bat
 if not defined DevEnvDir ( 
     call "%TOOLSPATH%\VsDevCmd.bat"
 )
-
-cd..
-MKDIR build & CD build & cmake .. & cmake --build . & CD ..
