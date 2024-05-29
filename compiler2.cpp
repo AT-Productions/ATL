@@ -86,7 +86,7 @@ int if_arr_contains(int array_type, std::string &buffer){
     return -1;
 }
 
-std::string look_ahead(uint16_t &cur_ind, std::string &line);
+std::string look_ahead(size_t &cur_ind, std::string &line);
 void check_separators(int x, std::vector<Token> *tokens, std::string &buffer);
 void check_operators(int x, std::vector<Token> *tokens, std::string &buffer);
 void check_keywords(int x, std::vector<Token> *tokens, std::string &buffer);
@@ -117,7 +117,7 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
     std::string test;
     while (std::getline(file, line)) {
         line_num++;
-        for(uint16_t cur_ind = 0; cur_ind <= line.length(); cur_ind++){
+        for(size_t cur_ind = 0; cur_ind <= line.length(); cur_ind++){
             line_pos++;
             buffer += line[cur_ind];
             ltrim(buffer); // remove leading whitespace, don't see any issues for now :))))))))
@@ -329,7 +329,7 @@ Type: 2 Subtype: 4 Value: )
     return tokens;
 }
 
-std::string look_ahead(uint16_t &cur_ind, std::string &line) {
+std::string look_ahead(size_t &cur_ind, std::string &line) {
     cur_ind++;
     if(cur_ind >= line.length())
         return "";
