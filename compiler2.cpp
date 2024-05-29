@@ -142,6 +142,7 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
     bool expect_pass = false;
     char prev_char = '\0';
     char curr_char = '\0';
+    char next_char = '\0';
     int i_free_use = 0;
     std::string test;
     while (std::getline(file, line)) {
@@ -150,29 +151,46 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
             line_pos++;
             buffer += line[cur_ind];
             ltrim(buffer); // remove leading whitespace, don't see any issues for now :))))))))
+            if(in_block_comment){
+                if(buffer[buffer.length()-2] == '*' && buffer[buffer.length()-1] == '/'){
+                    in_block_comment = false;
+                    tokens->push_back(Token(COMMENT, BLOCK_COMMENT, buffer));
+                    buffer = "";
+                }
+                continue;
+            }
             switch (line[cur_ind]){
                 case '/':
-                    if(look_ahead(cur_ind, line)[0] == '/'){
+                    next_char = look_ahead(cur_ind, line)[0];
+                    if(next_char == '/'){
                         buffer += '/';
-                        i_free_use = 0;
-                        // prev_char = '\0';
-                        // curr_char = '\0';
                         while(true){
                             buffer += look_ahead(cur_ind, line)[0];
                             if(line.length() < cur_ind){
-                                std::cout << "Linelength: " << line.length() << " cur_ind: " << cur_ind << std::endl;
                                 break;
                             }
                         }
-                        std::cout << "buffer: '" << buffer << std::endl;
                         tokens->push_back(Token(COMMENT, LINE_COMMENT, buffer));
                         buffer = "";
                         break;
-                    } else{
-                        // Else we must fall through to look for division operator
-                        cur_ind--;
+                    } 
+                    else if (next_char == '*'){
+                        // Start of block comment
+                        buffer += '*';
+                        in_block_comment = true;
+                        break;
+                    } 
+                    else {
+                        // must check for division operator
+                        int i_check_operators = if_arr_contains(LOOK_FOR_OPERATORS, buffer);
+                        if(i_check_operators != -1){
+                            check_operators(i_check_operators, tokens, buffer);
+                            buffer = "";
+                            continue;
+                        }
                     } 
                 case 0x0A:
+
                     tokens->push_back(Token(WHITESPACE, WHITESPACE_NEWLINE, "\n"));
                     break;
                 case 0x0D:
@@ -261,7 +279,7 @@ Type: 2 Subtype: 4 Value: )
                     continue;
                 }
                 int i_check_operators = if_arr_contains(LOOK_FOR_OPERATORS, buffer);
-                if(i_check_operators != -1 && (look_next[0] == 0x0A || look_next[0] == 0x0D || look_next[0] == 0x09)){
+                if(i_check_operators != -1){
                     check_operators(i_check_operators, tokens, buffer);
                     buffer = "";
                     continue;
@@ -304,7 +322,12 @@ Type: 2 Subtype: 4 Value: )
                 
                 look_next = look_ahead(cur_ind, line);
                 cur_ind--; // bad logic, will fix later
-                if(look_next[0] == 0x20 || look_next[0] == 0x0A || look_next[0] == 0x0D || look_next[0] == 0x09){
+                int check_operators_next = if_arr_contains(LOOK_FOR_OPERATORS, look_next);
+                int check_separators_next = if_arr_contains(LOOK_FOR_SEPARATORS, look_next);
+                if(look_next[0] == 0x20 || look_next[0] == 0x0A || 
+                    look_next[0] == 0x0D || look_next[0] == 0x09 ||
+                    (buffer != "" && check_operators_next != -1 || check_separators_next != -1)
+                    ){
                     /*+++
                     // buffer can add '' items, more work for syntax analyzer
                     // some reason one 0x20 is missing, will fix later
@@ -339,7 +362,6 @@ struct TEST {
 
                 // this has to made so that 1+1, i++ and so on can be tokenized
                 // will be fixed later for better version, seems to work for now
-                int check_operators_next = if_arr_contains(LOOK_FOR_OPERATORS, look_next);
                 if(check_operators_next != -1){
                     check_operators(check_operators_next, tokens, buffer);
                     buffer = "";
@@ -347,7 +369,6 @@ struct TEST {
                 }
 
 
-                int check_separators_next = if_arr_contains(LOOK_FOR_SEPARATORS, look_next);
                 if(check_separators_next != -1){
                     check_separators(check_separators_next, tokens, buffer);
                     buffer = "";
@@ -357,8 +378,9 @@ struct TEST {
             }
         }
 
-
-        buffer = "";
+        if(!in_block_comment){
+            buffer = "";
+        }
         line_pos = 0;
     }
     file.close();

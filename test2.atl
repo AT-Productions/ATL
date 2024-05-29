@@ -22,12 +22,17 @@ for(int index = 0; index < 100; index++){
 void test(string arg = "buffer"){}
 
 string troll = "loler"
-string troll = "lol\""
-char tee = '\''
+string troll = "lol\""//AAA
+char tee = '\'' // AND THIS COMMENT
+/* THIS HERE */
 
-print("kakka " + troll + " gagel")
+/*
+ and these 
+*/
+print("kakka " + troll + " gagel")//TRY THIS COMMENT
 
 
 // These two cause errors
 
 1 / 2
+print(index)
