@@ -1,6 +1,10 @@
 #pragma once
 #include <string>
 #include <vector>
+#if defined(LINUX) || defined(__linux__)
+#include <cstring>   // strcmp
+#include <algorithm> // std::find_if
+#endif
 
 #define VERSION_MAJOR           0
 #define VERSION_MINOR           1
