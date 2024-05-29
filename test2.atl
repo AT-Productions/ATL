@@ -1,7 +1,7 @@
 macro       TEST        1
 compiler    DISABLE     10
 
-exit(1  .1)
+exit(1.1)
 bool test = true
 int test = 1
 float test = 1.1
@@ -35,4 +35,6 @@ print("kakka " + troll + " gagel")//TRY THIS COMMENT
 // These two cause errors
 
 1 / 2
+i++
+i<<1
 print(index)

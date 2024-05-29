@@ -36,9 +36,6 @@ int main(int argc, char* argv[]){
             if(b_input){
                 message(REDEFINITION, FL_compiler1, "redefinition of input file or flag.", true);
             }
-            if(i + 1 >= argc){
-                message(NO_INPUT, FL_compiler1, "--input flag given without a file.", true);
-            }
             std::string fn = argv[i + 1];
             if(fn.substr(fn.find_last_of(".")) != ".atl"){
                 message(INVALID_FILE, FL_compiler1, "invalid file type: " + fn, true);
@@ -50,9 +47,6 @@ int main(int argc, char* argv[]){
         else if(strcmp(argv[i], "--output") == 0 || strcmp(argv[i], "-o") == 0){
             if(b_output){
                 message(REDEFINITION, FL_compiler1, "redefinition of output file or flag.", true);
-            }
-            if(i + 1 >= argc){
-                message(NO_OUTPUT, FL_compiler1, "--output flag given without a file.", true);
             }
             s_arguments[OUTPUT] = argv[i + 1];
             i++;
