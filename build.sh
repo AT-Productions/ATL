@@ -9,3 +9,5 @@ cd build
 
 cmake ..
 cmake --build .
+cd ..
+./build/atl -i test2.atl -o test

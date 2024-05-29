@@ -65,6 +65,9 @@ OPTIONS:\n\
     case INVALID_FILE:
         s_message = "Invalid file.";
         break;
+    case UNKNOWN_TOKEN:
+        s_message = "Unknown token at compiler3.";
+        break;
     default:    
         s_message = "Unknown error.";
         break;

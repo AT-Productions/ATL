@@ -294,30 +294,6 @@ Type: 2 Subtype: 4 Value: )
                     look_next[0] == 0x0D || look_next[0] == 0x09 ||
                     (buffer != "" && check_operators_next != -1 || check_separators_next != -1)
                     ){
-                    /*+++
-                    // buffer can add '' items, more work for syntax analyzer
-                    // some reason one 0x20 is missing, will fix later
-                    FROM ->
-struct TEST {
-    float margin
-    int amount
-}
-                    TO ->
-                    Type: '0' Subtype: '15' Value: 'struct'
-                    Type: '4' Subtype: '6' Value: 'TEST'
-                    Type: '2' Subtype: '1' Value: '{'
-                    Type: '4' Subtype: '6' Value: ''    | wildcards :DDD
-                    Type: '4' Subtype: '6' Value: ''    | wildcards :DDD
-                    Type: '4' Subtype: '6' Value: ''    | wildcards :DDD
-                    Type: '0' Subtype: '9' Value: 'float'
-                    Type: '4' Subtype: '6' Value: 'margin'
-                    Type: '4' Subtype: '6' Value: ''    | wildcards :DDD
-                    Type: '4' Subtype: '6' Value: ''    | wildcards :DDD
-                    Type: '4' Subtype: '6' Value: ''    | wildcards :DDD
-                    Type: '0' Subtype: '6' Value: 'int'
-                    Type: '4' Subtype: '6' Value: 'amount'
-                    Type: '2' Subtype: '2' Value: '}'
-                    ---*/
                     // IDENTIFIER_UNKNOWN is a placeholder for now, explained in compiler.hpp
                     if(buffer[0] != 0x0){
                         tokens->push_back(Token(IDENTIFIER, IDENTIFIER_UNKNOWN, buffer));

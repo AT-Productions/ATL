@@ -24,5 +24,6 @@
 #define MEMORY                  12
 #define TOKENIZER_SYNTAX        13
 #define INVALID_FILE            14
+#define UNKNOWN_TOKEN           15
 
 void message(int i_message, int i_fl_flag, std::string sp_message, bool fatal);
