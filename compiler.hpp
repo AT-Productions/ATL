@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <memory> // shared_ptr
 #if defined(LINUX) || defined(__linux__)
 #include <cstring>   // strcmp
 #include <algorithm> // std::find_if
@@ -54,6 +55,19 @@ enum Keyword_Tokens {
     KEYWORD_MACRO,          // define   | macro
     KEYWORD_COMPILER,       // compiler |pragma
     KEYWORD_VOID            // void
+
+    /*
+    ADD:
+    KEYWORD_BREAK
+    KEYWORD_CONTINUE
+    KEYWORD_SWITCH
+    KEYWORD_CASE
+    KEYWORD_DEFAULT
+    KEYWORD_DO
+    KEYWORD_GOTO
+    KEYWORD_SIZEOF
+    KEYWORD_TYPEOF
+    */
 };
 
 enum Operator_Tokens {
@@ -105,6 +119,9 @@ enum Literal_Tokens {
     BOOL_LITERAL            // true, false
 };
 
+// Identifier names are stored in the value field
+// of the token struct.
+// more accurate information will be gathered in syntaxanalysis
 enum Identifier_Tokens {
     IDENTIFIER_VARIABLE,    // variable
     IDENTIFIER_FUNCTION,    // function
@@ -137,7 +154,7 @@ enum Whitespace_Tokens {
     WHITESPACE_SPACE,       // ' '    0x20
     WHITESPACE_TAB,         // '\t'   0x09
     WHITESPACE_NEWLINE,     // '\n'   0x0A
-    WHITESPACE_RETURN       // '\r'   0x0D
+    WHITESPACE_RETURN       // '\r'   0x0D. Should be ['0x0D', '0x0A']. But I'll treat it as 0x0D since switch case is easier
 };
 
 struct Token {
@@ -158,41 +175,49 @@ Syntax analysis and parser struct and enums
 ---*/
 void syntaxanalysis(std::vector<Token> &tokens);
 
-enum Expression_Types {
-    EXPRESSION_LITERAL,
-    EXPRESSION_IDENTIFIER,
-    EXPRESSION_OPERATOR,
-    EXPRESSION_SEPARATOR,
-    EXPRESSION_KEYWORD,
-    EXPRESSION_COMMENT,
-    EXPRESSION_PREPROCESSOR,
-    EXPRESSION_WHITESPACE,
-    EXPRESSION_UNKNOWN
-};
 
+enum class Expression_Types {
+    Number,
+    Operator,
+    Expression,
+    Term,
+    Factor
+};
 /*+++
 Parser structs in order of appearance -
 lowest to highest
 Parse_Factor -> Parse_Term -> Parse_Expression
 ---*/
+
+// Factor is the lowest level of the parser
+// it is a number or a subexpression
 struct Parse_Factor {
     Expression_Types type;
-    int subtype;
     std::string value;
-    Parse_Factor(Expression_Types t, int st, std::string val) : type(t), subtype(st), value(val)
-    {}
+    std::shared_ptr<struct Parse_Expression> subexpression; // Optional subexpression
+
+    Parse_Factor(Expression_Types t, std::string val) 
+        : type(t), value(val) {}
 };
 
+// Term is a collection of factors and operators
+// it is a multiplication or division of factors
 struct Parse_Term {
     std::vector<Parse_Factor> factors;
-    Parse_Term(std::vector<Parse_Factor> f) : factors(f)
-    {}
+    std::vector<char> operators; // Operators between factors
+
+    Parse_Term(const std::vector<Parse_Factor>& f, const std::vector<char>& ops) 
+        : factors(f), operators(ops) {}
 };
 
+// Expression is a collection of terms and operators
+// it is an addition or subtraction of terms
 struct Parse_Expression {
     std::vector<Parse_Term> terms;
-    Parse_Expression(std::vector<Parse_Term> t) : terms(t)
-    {}
+    std::vector<char> operators; // Operators between terms
+
+    Parse_Expression(const std::vector<Parse_Term>& t, const std::vector<char>& ops) 
+        : terms(t), operators(ops) {}
 };
 
 

@@ -14,26 +14,118 @@ void syntaxanalysis(std::vector<Token> &tokens) {
         switch (tokens[cur_ind].type){
         case Tokens::KEYWORD:
             std::cout << "Keyword: " << tokens[cur_ind].value << std::endl;
+            switch (tokens[cur_ind].subtype){
+            case Keyword_Tokens::KEYWORD_EXIT: break;
+            case Keyword_Tokens::KEYWORD_IF: break;
+            case Keyword_Tokens::KEYWORD_ELSE: break;
+            case Keyword_Tokens::KEYWORD_WHILE: break;
+            case Keyword_Tokens::KEYWORD_FOR: break;
+            case Keyword_Tokens::KEYWORD_RETURN: break;
+            case Keyword_Tokens::KEYWORD_INT: break;
+            case Keyword_Tokens::KEYWORD_STRING: break;
+            case Keyword_Tokens::KEYWORD_CHAR: break;
+            case Keyword_Tokens::KEYWORD_FLOAT: break;
+            case Keyword_Tokens::KEYWORD_DOUBLE: break;
+            case Keyword_Tokens::KEYWORD_BOOL: break;
+            case Keyword_Tokens::KEYWORD_TRUE: break;
+            case Keyword_Tokens::KEYWORD_FALSE: break;
+            case Keyword_Tokens::KEYWORD_FUNCTION: break;
+            case Keyword_Tokens::KEYWORD_STRUCT: break;
+            case Keyword_Tokens::KEYWORD_ENUM: break;
+            case Keyword_Tokens::KEYWORD_IMPORT: break;
+            case Keyword_Tokens::KEYWORD_MACRO: break;
+            case Keyword_Tokens::KEYWORD_COMPILER: break;
+            case Keyword_Tokens::KEYWORD_VOID: break;
+            default:
+                message(UNKNOWN_TOKEN, FL_compiler3, 
+                "Unknown keyword subtype: " + 
+                std::to_string(tokens[cur_ind].subtype) + 
+                " value: " + 
+                tokens[cur_ind].value + 
+                " at line: " + 
+                std::to_string(tokens[cur_ind].line) + 
+                " column: " + 
+                std::to_string(tokens[cur_ind].column), 
+                true);
+                break;
+            }
             break;
         case Tokens::OPERATOR: 
             std::cout << "Operator: " << tokens[cur_ind].value << std::endl;
+            switch (tokens[cur_ind].subtype){
+            case Operator_Tokens::ADD: break;
+            case Operator_Tokens::SUB: break;
+            case Operator_Tokens::MUL: break;
+            case Operator_Tokens::ASSIGN: break;
+            case Operator_Tokens::ADD_ASSIGN: break;
+            case Operator_Tokens::SUB_ASSIGN: break;
+            case Operator_Tokens::EQ: break;
+            case Operator_Tokens::NEQ: break;
+            case Operator_Tokens::GT: break;
+            case Operator_Tokens::LT: break;
+            case Operator_Tokens::GTE: break;
+            case Operator_Tokens::LTE: break;
+            case Operator_Tokens::AND: break;
+            case Operator_Tokens::OR: break;
+            case Operator_Tokens::NOT: break;
+            case Operator_Tokens::BIT_AND: break;
+            case Operator_Tokens::BIT_OR: break;
+            case Operator_Tokens::BIT_XOR: break;
+            case Operator_Tokens::BIT_NOT: break;
+            case Operator_Tokens::LSHIFT: break;
+            case Operator_Tokens::RSHIFT: break;
+            case Operator_Tokens::MOD: break;
+            case Operator_Tokens::INC: break;
+            case Operator_Tokens::DEC: break;
+            default:
+                message(UNKNOWN_TOKEN, FL_compiler3, 
+                "Unknown operator subtype: " + 
+                std::to_string(tokens[cur_ind].subtype) + 
+                " value: " + 
+                tokens[cur_ind].value + 
+                " at line: " + 
+                std::to_string(tokens[cur_ind].line) + 
+                " column: " + 
+                std::to_string(tokens[cur_ind].column), 
+                true);
+                break;
+            }
             break;
         case Tokens::SEPARATOR: 
             std::cout << "Separator: " << tokens[cur_ind].value << std::endl;
+            switch (tokens[cur_ind].subtype){
+                case Separator_Tokens::SEMICOLON: break;
+                case Separator_Tokens::LBRACE: break;
+                case Separator_Tokens::RBRACE: break;
+                case Separator_Tokens::LPAREN: break;
+                case Separator_Tokens::RPAREN: break;
+                case Separator_Tokens::LBRACKET: break;
+                case Separator_Tokens::RBRACKET: break;
+                case Separator_Tokens::COMMA: break;
+                case Separator_Tokens::DOT: break;
+                case Separator_Tokens::COLON: break;
+                default:
+                    message(UNKNOWN_TOKEN, FL_compiler3, 
+                    "Unknown separator subtype: " + 
+                    std::to_string(tokens[cur_ind].subtype) + 
+                    " value: " + 
+                    tokens[cur_ind].value + 
+                    " at line: " + 
+                    std::to_string(tokens[cur_ind].line) + 
+                    " column: " + 
+                    std::to_string(tokens[cur_ind].column), 
+                    true);
+                    break;
+            }
             break;
         case Tokens::LITERAL: 
             std::cout << "Literal: " << tokens[cur_ind].value << std::endl;
             switch (tokens[cur_ind].subtype){
-            case Literal_Tokens::INT_LITERAL:
-                break;
-            case Literal_Tokens::FLOAT_LITERAL:
-                break;
-            case Literal_Tokens::STRING_LITERAL:
-                break;
-            case Literal_Tokens::CHAR_LITERAL:
-                break;
-            case Literal_Tokens::BOOL_LITERAL:
-                break;
+            case Literal_Tokens::INT_LITERAL: break;
+            case Literal_Tokens::FLOAT_LITERAL: break;
+            case Literal_Tokens::STRING_LITERAL: break;
+            case Literal_Tokens::CHAR_LITERAL: break;
+            case Literal_Tokens::BOOL_LITERAL: break;
             default:
                 message(UNKNOWN_TOKEN, FL_compiler3, 
                 "Unknown literal subtype: " + 
@@ -50,18 +142,68 @@ void syntaxanalysis(std::vector<Token> &tokens) {
             break;
         case Tokens::IDENTIFIER: 
             std::cout << "Identifier: " << tokens[cur_ind].value << std::endl;
+            switch (tokens[cur_ind].subtype){
+                case Identifier_Tokens::IDENTIFIER_VARIABLE: break;
+                case Identifier_Tokens::IDENTIFIER_FUNCTION: break;
+                case Identifier_Tokens::IDENTIFIER_STRUCT: break;
+                case Identifier_Tokens::IDENTIFIER_ENUM: break;
+                case Identifier_Tokens::IDENTIFIER_MACRO: break;
+                case Identifier_Tokens::IDENTIFIER_COMPILER: break;
+                case Identifier_Tokens::IDENTIFIER_UNKNOWN: break;
+                default:
+                    message(UNKNOWN_TOKEN, FL_compiler3, 
+                    "Unknown identifier subtype: " + 
+                    std::to_string(tokens[cur_ind].subtype) + 
+                    " value: " + 
+                    tokens[cur_ind].value + 
+                    " at line: " + 
+                    std::to_string(tokens[cur_ind].line) + 
+                    " column: " + 
+                    std::to_string(tokens[cur_ind].column), 
+                    true);
+                    break;
+            }
             break;
         case Tokens::COMMENT: 
             std::cout << "Comment: " << tokens[cur_ind].value << std::endl;
+            // No handling needed for comments for now
             break;
-        case Tokens::PREPROCESSOR: 
-            std::cout << "Preprocessor: " << tokens[cur_ind].value << std::endl;
-            break;
+        // case Tokens::PREPROCESSOR: 
+        //     std::cout << "Preprocessor: " << tokens[cur_ind].value << std::endl;
+        //     // No handling needed for preprocessor for now
+        //     break;
         case Tokens::WHITESPACE: 
             std::cout << "Whitespace: " << tokens[cur_ind].value << std::endl;
+            switch (tokens[cur_ind].subtype){
+                case Whitespace_Tokens::WHITESPACE_SPACE: break;
+                case Whitespace_Tokens::WHITESPACE_TAB: break;
+                case Whitespace_Tokens::WHITESPACE_NEWLINE: break;
+                case Whitespace_Tokens::WHITESPACE_RETURN: break;
+                default:
+                    message(UNKNOWN_TOKEN, FL_compiler3, 
+                    "Unknown whitespace subtype: " + 
+                    std::to_string(tokens[cur_ind].subtype) + 
+                    " value: " + 
+                    tokens[cur_ind].value + 
+                    " at line: " + 
+                    std::to_string(tokens[cur_ind].line) + 
+                    " column: " + 
+                    std::to_string(tokens[cur_ind].column), 
+                    true);
+                    break;
+            }
             break;
         default: 
-            message(UNKNOWN_TOKEN, FL_compiler3, "Unknown token type: " + std::to_string(tokens[cur_ind].type) + " subtype: " + std::to_string(tokens[cur_ind].subtype), true);
+            message(UNKNOWN_TOKEN, FL_compiler3,
+            "Unknown token type: " +
+            std::to_string(tokens[cur_ind].type) +
+            + " value: " +
+            tokens[cur_ind].value +
+            " at line: " +
+            std::to_string(tokens[cur_ind].line) +
+            " column: " +
+            std::to_string(tokens[cur_ind].column),
+            true);
             break;
         }
     }

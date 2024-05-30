@@ -12,9 +12,4 @@ void test(string arg = "buffer"){}
 
 string troll = "loler"
 string troll = "lol\""//AAA
-char tee = '\'' // AND THIS COMMENT
-
-11+13
-a && b
-test<<
-a-= a += b
+char tee = '\''
