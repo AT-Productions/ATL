@@ -4,37 +4,12 @@ compiler    DISABLE     10
 exit(1.1)
 bool test = true
 int test = 1
-float test = 1.1
+float test = 1.42
 string test = "abc\"lol"
-char char_test = '0x0D'
 char char_test = '\''
 
-struct TEST {
-    float margin
-    int amount
-}
-
-void test() {}
-
-for(int index = 0; index < 100; index++){
-    print(index)
-}
 void test(string arg = "buffer"){}
 
 string troll = "loler"
 string troll = "lol\""//AAA
 char tee = '\'' // AND THIS COMMENT
-/* THIS HERE */
-
-/*
- and these 
-*/
-print("kakka " + troll + " gagel")//TRY THIS COMMENT
-
-
-// These two cause errors
-
-1 / 2
-i++
-i<<1
-print(index)

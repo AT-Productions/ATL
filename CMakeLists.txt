@@ -27,4 +27,10 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ATL PROPERTY CXX_STANDARD 20)
 endif()
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  target_compile_options(ATL PRIVATE /WX)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  target_compile_options(ATL PRIVATE -Werror)
+endif()
+
 # TODO: Add tests and install targets if needed.

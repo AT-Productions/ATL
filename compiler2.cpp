@@ -32,11 +32,12 @@ std::string look_for_separators[] = {
     "(", ")", "{", "}", "[", "]", ";", ",", ".", ":"
 };
 
-#define LOOK_FOR_PREPROCESSOR 3
+// Don't think these are needed for now
+// #define LOOK_FOR_PREPROCESSOR 3
 // list of preprocessor from compiler.hpp/Preprocessor_Tokens
-std::string look_for_preprocessor[] = {
-    "import", "macro", "compiler"
-};
+// std::string look_for_preprocessor[] = {
+//     "import", "macro", "compiler"
+// };
 
 #define LOOK_FOR_LITERALS 4
 // list of literals from compiler.hpp/Literal_Tokens
@@ -68,13 +69,13 @@ int if_arr_contains(int array_type, std::string &buffer){
             i++;
         }
         break;
-    case LOOK_FOR_PREPROCESSOR:
-        for (const auto &pre : look_for_preprocessor){
-            if(pre == buffer)
-                return i;
-            i++;
-        }
-        break;
+    // case LOOK_FOR_PREPROCESSOR:
+    //     for (const auto &pre : look_for_preprocessor){
+    //         if(pre == buffer)
+    //             return i;
+    //         i++;
+    //     }
+    //     break;
     case LOOK_FOR_LITERALS:
         for (const auto &lit : look_for_literals){
             if(lit == buffer)
@@ -124,7 +125,7 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
             if(in_block_comment){
                 if(buffer[buffer.length()-2] == '*' && buffer[buffer.length()-1] == '/'){
                     in_block_comment = false;
-                    tokens->push_back(Token(COMMENT, BLOCK_COMMENT, buffer));
+                    tokens->push_back(Token(COMMENT, BLOCK_COMMENT, buffer, line_num, line_pos));
                     buffer = "";
                 }
                 continue;
@@ -140,7 +141,7 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
                                 break;
                             }
                         }
-                        tokens->push_back(Token(COMMENT, LINE_COMMENT, buffer));
+                        tokens->push_back(Token(COMMENT, LINE_COMMENT, buffer, line_num, line_pos));
                         buffer = "";
                         break;
                     } 
@@ -160,10 +161,10 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
                         }
                     } 
                 case 0x0A:
-                    tokens->push_back(Token(WHITESPACE, WHITESPACE_NEWLINE, "\n"));
+                    tokens->push_back(Token(WHITESPACE, WHITESPACE_NEWLINE, "\n", line_num, line_pos));
                     break;
                 case 0x0D:
-                    tokens->push_back(Token(WHITESPACE, WHITESPACE_RETURN, "\r"));
+                    tokens->push_back(Token(WHITESPACE, WHITESPACE_RETURN, "\r", line_num, line_pos));
                     break;
                 case '"': 
                     // string
@@ -184,7 +185,7 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
                     }
                     if(curr_char == '"'){
                         buffer += '"';
-                        tokens->push_back(Token(LITERAL, STRING_LITERAL, buffer));
+                        tokens->push_back(Token(LITERAL, STRING_LITERAL, buffer, line_num, line_pos));
                         cur_ind++;
                     } else {
                         message(TOKENIZER_SYNTAX, FL_compiler2, "String not closed at row: " + std::to_string(line_num) + " @ " + std::to_string(line_pos) + " - " + buffer, true);
@@ -226,7 +227,7 @@ Type: 2 Subtype: 4 Value: )
                     }
                     if(curr_char == '\''){
                         buffer += '\'';
-                        tokens->push_back(Token(LITERAL, CHAR_LITERAL, buffer));
+                        tokens->push_back(Token(LITERAL, CHAR_LITERAL, buffer, line_num, line_pos));
                         cur_ind++;
                     } else {
                         message(TOKENIZER_SYNTAX, FL_compiler2, "Char not closed at row: " + std::to_string(line_num) + " @ " + std::to_string(line_pos) + " - " + buffer, true);
@@ -258,30 +259,29 @@ Type: 2 Subtype: 4 Value: )
                     buffer = "";
                     continue;
                 }
-                int i_check_preprocessor = if_arr_contains(LOOK_FOR_PREPROCESSOR, buffer);
-                if(i_check_preprocessor != -1 && (look_next[0] == 0x0A || look_next[0] == 0x0D || look_next[0] == 0x09)){
-                    check_preprocessor(i_check_preprocessor, tokens, buffer);
-                    buffer = "";
-                    continue;
-                }
+                // int i_check_preprocessor = if_arr_contains(LOOK_FOR_PREPROCESSOR, buffer);
+                // if(i_check_preprocessor != -1 && (look_next[0] == 0x0A || look_next[0] == 0x0D || look_next[0] == 0x09)){
+                //     check_preprocessor(i_check_preprocessor, tokens, buffer);
+                //     buffer = "";
+                //     continue;
+                // }
                 
-                /*+++
-                floats and doubles (such as 12.1) will be tokenized as:
-                ================================================================
-                Type: 3 Subtype: 0 Value: 12    ||    LITERAL,  INT_LITERAL, 12
-                Type: 2 Subtype: 8 Value: .     ||    OPERATOR, DOT        , .
-                Type: 3 Subtype: 0 Value: 1     ||    LITERAL,  INT_LITERAL, 1
-                ================================================================
-                which will be later converted to 12.1 in the syntax analysis
-                ---*/
                 if(std::isdigit(line[cur_ind])){
-                    while(std::isdigit(look_ahead(cur_ind, line)[0])){
+                    // curr_char = line[cur_ind];
+                    curr_char = '\0';
+                    while(std::isdigit(curr_char = look_ahead(cur_ind, line)[0]) || curr_char== '.'){
                         buffer += line[cur_ind];
                     }
                     // TODO test this decriment
                     // -- propably works
                     cur_ind--;
-                    tokens->push_back(Token(LITERAL, INT_LITERAL, buffer));
+                    if(buffer.find('.') == std::string::npos){
+                        tokens->push_back(Token(LITERAL, INT_LITERAL, buffer, line_num, line_pos));
+                        std::cout << "INT! '" << buffer << "'" << std::endl;
+                    } else {
+                        std::cout << "FLOAT! '" << buffer << "'" << std::endl;
+                        tokens->push_back(Token(LITERAL, FLOAT_LITERAL, buffer, line_num, line_pos));
+                    }
                     buffer = "";
                     continue;
                 }
@@ -296,7 +296,7 @@ Type: 2 Subtype: 4 Value: )
                     ){
                     // IDENTIFIER_UNKNOWN is a placeholder for now, explained in compiler.hpp
                     if(buffer[0] != 0x0){
-                        tokens->push_back(Token(IDENTIFIER, IDENTIFIER_UNKNOWN, buffer));
+                        tokens->push_back(Token(IDENTIFIER, IDENTIFIER_UNKNOWN, buffer, line_num, line_pos));
                     }
                     buffer = "";
                     continue;
@@ -341,15 +341,15 @@ std::string look_ahead(size_t &cur_ind, std::string &line) {
 void check_separators(int x, std::vector<Token> *tokens, std::string &buffer) {
     if(buffer == "") return;
     switch (x){
-        case 0: tokens->push_back(Token(SEPARATOR, LPAREN, buffer)); break;
-        case 1: tokens->push_back(Token(SEPARATOR, RPAREN, buffer)); break;
-        case 2: tokens->push_back(Token(SEPARATOR, LBRACE, buffer)); break;
-        case 3: tokens->push_back(Token(SEPARATOR, RBRACE, buffer)); break;
-        case 4: tokens->push_back(Token(SEPARATOR, LBRACKET, buffer)); break;
-        case 5: tokens->push_back(Token(SEPARATOR, RBRACKET, buffer)); break;
-        case 6: tokens->push_back(Token(SEPARATOR, SEMICOLON, buffer)); break;
-        case 7: tokens->push_back(Token(SEPARATOR, COMMA, buffer)); break;
-        case 8: tokens->push_back(Token(SEPARATOR, DOT, buffer)); break;
+        case 0: tokens->push_back(Token(SEPARATOR, LPAREN, buffer, line_num, line_pos)); break;
+        case 1: tokens->push_back(Token(SEPARATOR, RPAREN, buffer, line_num, line_pos)); break;
+        case 2: tokens->push_back(Token(SEPARATOR, LBRACE, buffer, line_num, line_pos)); break;
+        case 3: tokens->push_back(Token(SEPARATOR, RBRACE, buffer, line_num, line_pos)); break;
+        case 4: tokens->push_back(Token(SEPARATOR, LBRACKET, buffer, line_num, line_pos)); break;
+        case 5: tokens->push_back(Token(SEPARATOR, RBRACKET, buffer, line_num, line_pos)); break;
+        case 6: tokens->push_back(Token(SEPARATOR, SEMICOLON, buffer, line_num, line_pos)); break;
+        case 7: tokens->push_back(Token(SEPARATOR, COMMA, buffer, line_num, line_pos)); break;
+        case 8: tokens->push_back(Token(SEPARATOR, DOT, buffer, line_num, line_pos)); break;
         default: 
         message(TOKENIZER_SYNTAX, FL_compiler2, 
         "check_separators " + buffer + " at row: " 
@@ -361,31 +361,31 @@ void check_separators(int x, std::vector<Token> *tokens, std::string &buffer) {
 void check_operators(int x, std::vector<Token> *tokens, std::string &buffer) {
     if(buffer == "") return;
     switch (x){
-        case 0: tokens->push_back(Token(OPERATOR, ADD, buffer)); break;
-        case 1: tokens->push_back(Token(OPERATOR, SUB, buffer)); break;
-        case 2: tokens->push_back(Token(OPERATOR, MUL, buffer)); break;
-        case 3: tokens->push_back(Token(OPERATOR, DIV, buffer)); break;
-        case 4: tokens->push_back(Token(OPERATOR, ASSIGN, buffer)); break;
-        case 5: tokens->push_back(Token(OPERATOR, ADD_ASSIGN, buffer)); break;
-        case 6: tokens->push_back(Token(OPERATOR, SUB_ASSIGN, buffer)); break;
-        case 7: tokens->push_back(Token(OPERATOR, EQ, buffer)); break;
-        case 8: tokens->push_back(Token(OPERATOR, NEQ, buffer)); break;
-        case 9: tokens->push_back(Token(OPERATOR, GT, buffer)); break;
-        case 10: tokens->push_back(Token(OPERATOR, LT, buffer)); break;
-        case 11: tokens->push_back(Token(OPERATOR, GTE, buffer)); break;
-        case 12: tokens->push_back(Token(OPERATOR, LTE, buffer)); break;
-        case 13: tokens->push_back(Token(OPERATOR, AND, buffer)); break;
-        case 14: tokens->push_back(Token(OPERATOR, OR, buffer)); break;
-        case 15: tokens->push_back(Token(OPERATOR, NOT, buffer)); break;
-        case 16: tokens->push_back(Token(OPERATOR, BIT_AND, buffer)); break;
-        case 17: tokens->push_back(Token(OPERATOR, BIT_OR, buffer)); break;
-        case 18: tokens->push_back(Token(OPERATOR, BIT_XOR, buffer)); break;
-        case 19: tokens->push_back(Token(OPERATOR, BIT_NOT, buffer)); break;
-        case 20: tokens->push_back(Token(OPERATOR, LSHIFT, buffer)); break;
-        case 21: tokens->push_back(Token(OPERATOR, RSHIFT, buffer)); break;
-        case 22: tokens->push_back(Token(OPERATOR, MOD, buffer)); break;
-        case 23: tokens->push_back(Token(OPERATOR, INC, buffer)); break;
-        case 24: tokens->push_back(Token(OPERATOR, DEC, buffer)); break;
+        case 0: tokens->push_back(Token(OPERATOR, ADD, buffer, line_num, line_pos)); break;
+        case 1: tokens->push_back(Token(OPERATOR, SUB, buffer, line_num, line_pos)); break;
+        case 2: tokens->push_back(Token(OPERATOR, MUL, buffer, line_num, line_pos)); break;
+        case 3: tokens->push_back(Token(OPERATOR, DIV, buffer, line_num, line_pos)); break;
+        case 4: tokens->push_back(Token(OPERATOR, ASSIGN, buffer, line_num, line_pos)); break;
+        case 5: tokens->push_back(Token(OPERATOR, ADD_ASSIGN, buffer, line_num, line_pos)); break;
+        case 6: tokens->push_back(Token(OPERATOR, SUB_ASSIGN, buffer, line_num, line_pos)); break;
+        case 7: tokens->push_back(Token(OPERATOR, EQ, buffer, line_num, line_pos)); break;
+        case 8: tokens->push_back(Token(OPERATOR, NEQ, buffer, line_num, line_pos)); break;
+        case 9: tokens->push_back(Token(OPERATOR, GT, buffer, line_num, line_pos)); break;
+        case 10: tokens->push_back(Token(OPERATOR, LT, buffer, line_num, line_pos)); break;
+        case 11: tokens->push_back(Token(OPERATOR, GTE, buffer, line_num, line_pos)); break;
+        case 12: tokens->push_back(Token(OPERATOR, LTE, buffer, line_num, line_pos)); break;
+        case 13: tokens->push_back(Token(OPERATOR, AND, buffer, line_num, line_pos)); break;
+        case 14: tokens->push_back(Token(OPERATOR, OR, buffer, line_num, line_pos)); break;
+        case 15: tokens->push_back(Token(OPERATOR, NOT, buffer, line_num, line_pos)); break;
+        case 16: tokens->push_back(Token(OPERATOR, BIT_AND, buffer, line_num, line_pos)); break;
+        case 17: tokens->push_back(Token(OPERATOR, BIT_OR, buffer, line_num, line_pos)); break;
+        case 18: tokens->push_back(Token(OPERATOR, BIT_XOR, buffer, line_num, line_pos)); break;
+        case 19: tokens->push_back(Token(OPERATOR, BIT_NOT, buffer, line_num, line_pos)); break;
+        case 20: tokens->push_back(Token(OPERATOR, LSHIFT, buffer, line_num, line_pos)); break;
+        case 21: tokens->push_back(Token(OPERATOR, RSHIFT, buffer, line_num, line_pos)); break;
+        case 22: tokens->push_back(Token(OPERATOR, MOD, buffer, line_num, line_pos)); break;
+        case 23: tokens->push_back(Token(OPERATOR, INC, buffer, line_num, line_pos)); break;
+        case 24: tokens->push_back(Token(OPERATOR, DEC, buffer, line_num, line_pos)); break;
         default: 
         message(TOKENIZER_SYNTAX, FL_compiler2, 
         "check_operators " + buffer + " at row: " 
@@ -399,27 +399,27 @@ void check_keywords(int x, std::vector<Token> *tokens, std::string &buffer) {
     if(buffer == "") return;
     // will improve this later
     switch (x){
-        case 0: tokens->push_back(Token(KEYWORD, KEYWORD_EXIT, buffer)); break;
-        case 1: tokens->push_back(Token(KEYWORD, KEYWORD_IF, buffer)); break;
-        case 2: tokens->push_back(Token(KEYWORD, KEYWORD_ELSE, buffer)); break;
-        case 3: tokens->push_back(Token(KEYWORD, KEYWORD_WHILE, buffer)); break;
-        case 4: tokens->push_back(Token(KEYWORD, KEYWORD_FOR, buffer)); break;
-        case 5: tokens->push_back(Token(KEYWORD, KEYWORD_RETURN, buffer)); break;
-        case 6: tokens->push_back(Token(KEYWORD, KEYWORD_INT, buffer)); break;
-        case 7: tokens->push_back(Token(KEYWORD, KEYWORD_STRING, buffer)); break;
-        case 8: tokens->push_back(Token(KEYWORD, KEYWORD_CHAR, buffer)); break;
-        case 9: tokens->push_back(Token(KEYWORD, KEYWORD_FLOAT, buffer)); break;
-        case 10: tokens->push_back(Token(KEYWORD, KEYWORD_DOUBLE, buffer)); break;
-        case 11: tokens->push_back(Token(KEYWORD, KEYWORD_BOOL, buffer)); break;
-        case 12: tokens->push_back(Token(KEYWORD, KEYWORD_TRUE, buffer)); break;
-        case 13: tokens->push_back(Token(KEYWORD, KEYWORD_FALSE, buffer)); break;
-        case 14: tokens->push_back(Token(KEYWORD, KEYWORD_FUNCTION, buffer)); break;
-        case 15: tokens->push_back(Token(KEYWORD, KEYWORD_STRUCT, buffer)); break;
-        case 16: tokens->push_back(Token(KEYWORD, KEYWORD_ENUM, buffer)); break;
-        case 17: tokens->push_back(Token(KEYWORD, KEYWORD_IMPORT, buffer)); break;
-        case 18: tokens->push_back(Token(KEYWORD, KEYWORD_MACRO, buffer)); break;
-        case 19: tokens->push_back(Token(KEYWORD, KEYWORD_COMPILER, buffer)); break;
-        case 20: tokens->push_back(Token(KEYWORD, KEYWORD_VOID, buffer)); break;
+        case 0: tokens->push_back(Token(KEYWORD, KEYWORD_EXIT, buffer, line_num, line_pos)); break;
+        case 1: tokens->push_back(Token(KEYWORD, KEYWORD_IF, buffer, line_num, line_pos)); break;
+        case 2: tokens->push_back(Token(KEYWORD, KEYWORD_ELSE, buffer, line_num, line_pos)); break;
+        case 3: tokens->push_back(Token(KEYWORD, KEYWORD_WHILE, buffer, line_num, line_pos)); break;
+        case 4: tokens->push_back(Token(KEYWORD, KEYWORD_FOR, buffer, line_num, line_pos)); break;
+        case 5: tokens->push_back(Token(KEYWORD, KEYWORD_RETURN, buffer, line_num, line_pos)); break;
+        case 6: tokens->push_back(Token(KEYWORD, KEYWORD_INT, buffer, line_num, line_pos)); break;
+        case 7: tokens->push_back(Token(KEYWORD, KEYWORD_STRING, buffer, line_num, line_pos)); break;
+        case 8: tokens->push_back(Token(KEYWORD, KEYWORD_CHAR, buffer, line_num, line_pos)); break;
+        case 9: tokens->push_back(Token(KEYWORD, KEYWORD_FLOAT, buffer, line_num, line_pos)); break;
+        case 10: tokens->push_back(Token(KEYWORD, KEYWORD_DOUBLE, buffer, line_num, line_pos)); break;
+        case 11: tokens->push_back(Token(KEYWORD, KEYWORD_BOOL, buffer, line_num, line_pos)); break;
+        case 12: tokens->push_back(Token(KEYWORD, KEYWORD_TRUE, buffer, line_num, line_pos)); break;
+        case 13: tokens->push_back(Token(KEYWORD, KEYWORD_FALSE, buffer, line_num, line_pos)); break;
+        case 14: tokens->push_back(Token(KEYWORD, KEYWORD_FUNCTION, buffer, line_num, line_pos)); break;
+        case 15: tokens->push_back(Token(KEYWORD, KEYWORD_STRUCT, buffer, line_num, line_pos)); break;
+        case 16: tokens->push_back(Token(KEYWORD, KEYWORD_ENUM, buffer, line_num, line_pos)); break;
+        case 17: tokens->push_back(Token(KEYWORD, KEYWORD_IMPORT, buffer, line_num, line_pos)); break;
+        case 18: tokens->push_back(Token(KEYWORD, KEYWORD_MACRO, buffer, line_num, line_pos)); break;
+        case 19: tokens->push_back(Token(KEYWORD, KEYWORD_COMPILER, buffer, line_num, line_pos)); break;
+        case 20: tokens->push_back(Token(KEYWORD, KEYWORD_VOID, buffer, line_num, line_pos)); break;
         default: 
         message(TOKENIZER_SYNTAX, FL_compiler2, 
         "check_keywords " + buffer + " at row: " 
@@ -428,18 +428,18 @@ void check_keywords(int x, std::vector<Token> *tokens, std::string &buffer) {
         , true);
     }
 }
-void check_preprocessor(int x, std::vector<Token> *tokens, std::string &buffer){
-    if(buffer == "") return;
-    switch (x){
-        case 0: tokens->push_back(Token(PREPROCESSOR, PREPROCESSOR_IMPORT, buffer)); break;
-        case 1: tokens->push_back(Token(PREPROCESSOR, PREPROCESSOR_MACRO, buffer)); break;
-        case 2: tokens->push_back(Token(PREPROCESSOR, PREPROCESSOR_COMPILER, buffer)); break;
-        default: 
-        message(TOKENIZER_SYNTAX, FL_compiler2, 
-        "check_preprocessor " + buffer + " at row: " 
-        + std::to_string(line_num) + " @ " + std::to_string(line_pos) +
-        " - code: " + std::to_string(x) + " not found in operators list."
-        , true);
-    }
-}
+// void check_preprocessor(int x, std::vector<Token> *tokens, std::string &buffer){
+//     if(buffer == "") return;
+//     switch (x){
+//         case 0: tokens->push_back(Token(PREPROCESSOR, PREPROCESSOR_IMPORT, buffer)); break;
+//         case 1: tokens->push_back(Token(PREPROCESSOR, PREPROCESSOR_MACRO, buffer)); break;
+//         case 2: tokens->push_back(Token(PREPROCESSOR, PREPROCESSOR_COMPILER, buffer)); break;
+//         default: 
+//         message(TOKENIZER_SYNTAX, FL_compiler2, 
+//         "check_preprocessor " + buffer + " at row: " 
+//         + std::to_string(line_num) + " @ " + std::to_string(line_pos) +
+//         " - code: " + std::to_string(x) + " not found in operators list."
+//         , true);
+//     }
+// }
 

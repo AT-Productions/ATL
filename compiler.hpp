@@ -18,6 +18,9 @@
 #define S_ARG_SIZE              2       // SIZE OF S_ARGUMENTS
 extern std::vector<std::string> s_arguments;
 
+/*+++
+Tokenizer enums and structs
+---*/
 enum Tokens {
     KEYWORD,
     OPERATOR,
@@ -96,7 +99,7 @@ enum Separator_Tokens {
 
 enum Literal_Tokens {
     INT_LITERAL,            // 1
-    FLOAT_LITERAL,          // 1.0
+    FLOAT_LITERAL,          // 1.0 
     STRING_LITERAL,         // "string"
     CHAR_LITERAL,           // 'c'
     BOOL_LITERAL            // true, false
@@ -118,6 +121,7 @@ enum Comment_Tokens {
     BLOCK_COMMENT           // /* */
 };
 
+// not sure if i should use this
 enum Preprocessor_Tokens {
     PREPROCESSOR_IMPORT,    // #include
     PREPROCESSOR_MACRO,     // #define
@@ -135,13 +139,56 @@ struct Token {
     Tokens type;
     int subtype;
     std::string value;
-    Token(Tokens t, int st, std::string val) : type(t), subtype(st), value(val) {}
+    int line;
+    int column;
+    Token(Tokens t, int st, std::string val, int l, int c) : type(t), subtype(st), value(val), line(l), column(c)
+    {}
 };
 
 std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments);
+
+
+/*+++
+Syntax analysis and parser struct and enums
+---*/
 void syntaxanalysis(std::vector<Token> &tokens);
 
+enum Expression_Types {
+    EXPRESSION_LITERAL,
+    EXPRESSION_IDENTIFIER,
+    EXPRESSION_OPERATOR,
+    EXPRESSION_SEPARATOR,
+    EXPRESSION_KEYWORD,
+    EXPRESSION_COMMENT,
+    EXPRESSION_PREPROCESSOR,
+    EXPRESSION_WHITESPACE,
+    EXPRESSION_UNKNOWN
+};
 
+/*+++
+Parser structs in order of appearance -
+lowest to highest
+Parse_Factor -> Parse_Term -> Parse_Expression
+---*/
+struct Parse_Factor {
+    Expression_Types type;
+    int subtype;
+    std::string value;
+    Parse_Factor(Expression_Types t, int st, std::string val) : type(t), subtype(st), value(val)
+    {}
+};
+
+struct Parse_Term {
+    std::vector<Parse_Factor> factors;
+    Parse_Term(std::vector<Parse_Factor> f) : factors(f)
+    {}
+};
+
+struct Parse_Expression {
+    std::vector<Parse_Term> terms;
+    Parse_Expression(std::vector<Parse_Term> t) : terms(t)
+    {}
+};
 
 
 // thanks to https://stackoverflow.com/a/217605
