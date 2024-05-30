@@ -24,15 +24,15 @@ void syntaxanalysis(std::vector<Token> &tokens) {
         case Tokens::LITERAL: 
             std::cout << "Literal: " << tokens[cur_ind].value << std::endl;
             switch (tokens[cur_ind].subtype){
-            case Literal_Tokens::INT_LITERAL: 
+            case Literal_Tokens::INT_LITERAL:
                 break;
-            case Literal_Tokens::FLOAT_LITERAL: 
+            case Literal_Tokens::FLOAT_LITERAL:
                 break;
-            case Literal_Tokens::STRING_LITERAL: 
+            case Literal_Tokens::STRING_LITERAL:
                 break;
-            case Literal_Tokens::CHAR_LITERAL: 
+            case Literal_Tokens::CHAR_LITERAL:
                 break;
-            case Literal_Tokens::BOOL_LITERAL: 
+            case Literal_Tokens::BOOL_LITERAL:
                 break;
             default:
                 message(UNKNOWN_TOKEN, FL_compiler3, 

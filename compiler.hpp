@@ -121,12 +121,17 @@ enum Comment_Tokens {
     BLOCK_COMMENT           // /* */
 };
 
-// not sure if i should use this
+/*+++
+Preprocessor_Tokens is not used in the lexer -
+since they are all keywords too and will be -
+treated as such
+
 enum Preprocessor_Tokens {
     PREPROCESSOR_IMPORT,    // #include
     PREPROCESSOR_MACRO,     // #define
     PREPROCESSOR_COMPILER   // #pragma
 };
+---*/
 
 enum Whitespace_Tokens {
     WHITESPACE_SPACE,       // ' '    0x20

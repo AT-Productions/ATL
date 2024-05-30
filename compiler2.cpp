@@ -91,7 +91,7 @@ std::string look_ahead(size_t &cur_ind, std::string &line);
 void check_separators(int x, std::vector<Token> *tokens, std::string &buffer);
 void check_operators(int x, std::vector<Token> *tokens, std::string &buffer);
 void check_keywords(int x, std::vector<Token> *tokens, std::string &buffer);
-void check_preprocessor(int x, std::vector<Token> *tokens, std::string &buffer);
+// void check_preprocessor(int x, std::vector<Token> *tokens, std::string &buffer);
 int line_num = 0;
 int line_pos = 0;
 
@@ -247,6 +247,20 @@ Type: 2 Subtype: 4 Value: )
                 }
                 int i_check_operators = if_arr_contains(LOOK_FOR_OPERATORS, buffer);
                 if(i_check_operators != -1){
+                    /*+++
+                    Since double length operators exist (++, <<, ||)
+                    I have to check for the next character to see if it is an operator
+                    propably a better way to do this, will fix later
+                    :-)
+                    ---*/
+                    int i_check_operators_next = if_arr_contains(LOOK_FOR_OPERATORS, look_next);
+                    if(i_check_operators_next != -1){
+                        buffer += look_next;
+                        cur_ind++; // since we are looking ahead
+
+                        // check for double length operators
+                        i_check_operators = if_arr_contains(LOOK_FOR_OPERATORS, buffer);
+                    }
                     check_operators(i_check_operators, tokens, buffer);
                     buffer = "";
                     continue;
@@ -267,7 +281,6 @@ Type: 2 Subtype: 4 Value: )
                 // }
                 
                 if(std::isdigit(line[cur_ind])){
-                    // curr_char = line[cur_ind];
                     curr_char = '\0';
                     while(std::isdigit(curr_char = look_ahead(cur_ind, line)[0]) || curr_char== '.'){
                         buffer += line[cur_ind];
@@ -277,9 +290,7 @@ Type: 2 Subtype: 4 Value: )
                     cur_ind--;
                     if(buffer.find('.') == std::string::npos){
                         tokens->push_back(Token(LITERAL, INT_LITERAL, buffer, line_num, line_pos));
-                        std::cout << "INT! '" << buffer << "'" << std::endl;
                     } else {
-                        std::cout << "FLOAT! '" << buffer << "'" << std::endl;
                         tokens->push_back(Token(LITERAL, FLOAT_LITERAL, buffer, line_num, line_pos));
                     }
                     buffer = "";
@@ -352,9 +363,9 @@ void check_separators(int x, std::vector<Token> *tokens, std::string &buffer) {
         case 8: tokens->push_back(Token(SEPARATOR, DOT, buffer, line_num, line_pos)); break;
         default: 
         message(TOKENIZER_SYNTAX, FL_compiler2, 
-        "check_separators " + buffer + " at row: " 
+        "check_separators '" + buffer + "' at row: " 
         + std::to_string(line_num) + " @ " + std::to_string(line_pos) +
-        " - code: " + std::to_string(x) + " not found in operators list."
+        " - code: " + std::to_string(x) + " not found in separators list."
         , true);
     }
 }
@@ -388,7 +399,7 @@ void check_operators(int x, std::vector<Token> *tokens, std::string &buffer) {
         case 24: tokens->push_back(Token(OPERATOR, DEC, buffer, line_num, line_pos)); break;
         default: 
         message(TOKENIZER_SYNTAX, FL_compiler2, 
-        "check_operators " + buffer + " at row: " 
+        "check_operators '" + buffer + "' at row: " 
         + std::to_string(line_num) + " @ " + std::to_string(line_pos) +
         " - code: " + std::to_string(x) + " not found in operators list."
         , true);
@@ -422,12 +433,14 @@ void check_keywords(int x, std::vector<Token> *tokens, std::string &buffer) {
         case 20: tokens->push_back(Token(KEYWORD, KEYWORD_VOID, buffer, line_num, line_pos)); break;
         default: 
         message(TOKENIZER_SYNTAX, FL_compiler2, 
-        "check_keywords " + buffer + " at row: " 
+        "check_keywords '" + buffer + "' at row: " 
         + std::to_string(line_num) + " @ " + std::to_string(line_pos) +
-        " - code: " + std::to_string(x) + " not found in operators list."
+        " - code: " + std::to_string(x) + " not found in keywords list."
         , true);
     }
 }
+
+// !UPDATE ERROR MESSAGE IF TAKEN INTO USE
 // void check_preprocessor(int x, std::vector<Token> *tokens, std::string &buffer){
 //     if(buffer == "") return;
 //     switch (x){
