@@ -10,6 +10,8 @@
 #define FL_compiler7            7
 #define FL_compiler8            8
 
+#define FL_parse_term           9
+
 #define NO_ARGUMENTS            1
 #define HELP                    2
 #define VERSION                 3
@@ -25,5 +27,6 @@
 #define TOKENIZER_SYNTAX        13
 #define INVALID_FILE            14
 #define UNKNOWN_TOKEN           15
+#define INVALID_ARGUMENT_PARSER 16
 
 void message(int i_message, int i_fl_flag, std::string sp_message, bool fatal);

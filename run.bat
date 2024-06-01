@@ -1,1 +1,1 @@
-call build -o test -i test2.atl
+call build -o test -i test3.atl

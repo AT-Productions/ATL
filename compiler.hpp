@@ -67,6 +67,7 @@ enum Keyword_Tokens {
     KEYWORD_GOTO
     KEYWORD_SIZEOF
     KEYWORD_TYPEOF
+    KEYWORD_EXPORT
     */
 };
 
@@ -150,11 +151,16 @@ enum Preprocessor_Tokens {
 };
 ---*/
 
+#define mcr_WHITESPACE_SPACE            0x20
+#define mcr_WHITESPACE_TAB              0x09
+#define mcr_WHITESPACE_NEWLINE          0x0A
+#define mcr_WHITESPACE_RETURN           0x0D
+
 enum Whitespace_Tokens {
-    WHITESPACE_SPACE,       // ' '    0x20
-    WHITESPACE_TAB,         // '\t'   0x09
-    WHITESPACE_NEWLINE,     // '\n'   0x0A
-    WHITESPACE_RETURN       // '\r'   0x0D. Should be ['0x0D', '0x0A']. But I'll treat it as 0x0D since switch case is easier
+    WHITESPACE_SPACE,       // ' '      0x20
+    WHITESPACE_TAB,         // '\t'     0x09
+    WHITESPACE_NEWLINE,     // '\n'     0x0A
+    WHITESPACE_RETURN       // '\r'     0x0D. Should be ['0x0D', '0x0A']. But I'll treat it as 0x0D since switch case is easier
 };
 
 struct Token {
@@ -177,7 +183,7 @@ void syntaxanalysis(std::vector<Token> &tokens);
 
 
 enum class Expression_Types {
-    Number,
+    Literal,
     Operator,
     Expression,
     Term,
@@ -196,9 +202,15 @@ struct Parse_Factor {
     std::string value;
     std::shared_ptr<struct Parse_Expression> subexpression; // Optional subexpression
 
-    Parse_Factor(Expression_Types t, std::string val) 
-        : type(t), value(val) {}
+    // Constructor for literals
+    Parse_Factor(Expression_Types t, std::string val, std::shared_ptr<Parse_Expression> subexpr = nullptr) 
+        : type(t), value(val), subexpression(subexpr) {}
+
+    // Constructor for expressions
+    Parse_Factor(Expression_Types t, std::shared_ptr<Parse_Expression> subexpr) 
+        : type(t), value(""), subexpression(subexpr) {}
 };
+
 
 // Term is a collection of factors and operators
 // it is a multiplication or division of factors
@@ -219,6 +231,25 @@ struct Parse_Expression {
     Parse_Expression(const std::vector<Parse_Term>& t, const std::vector<char>& ops) 
         : terms(t), operators(ops) {}
 };
+
+// Statement is a value and an expression
+// it is a variable assignment or a function call
+struct Parse_Statement {
+    std::string value;
+    std::shared_ptr<Parse_Expression> expression;
+    Parse_Statement(std::string val, std::shared_ptr<Parse_Expression> exp) 
+        : value(val), expression(exp) {}
+};
+
+// Function is a collection of statements
+// it is a function definition
+struct Parse_Function {
+    std::string name;
+    std::vector<Parse_Statement> statements;
+    Parse_Function(std::string n, const std::vector<Parse_Statement>& s) 
+        : name(n), statements(s) {}
+};
+
 
 
 // thanks to https://stackoverflow.com/a/217605

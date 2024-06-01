@@ -7,7 +7,7 @@
 
 
 
-#define LOOK_FOR_WORDS 0
+#define LOOK_FOR_WORDS          0
 // list of keywords from compiler.hpp/Keyword_Tokens
 std::string look_for_words[] = {
     "exit", "if", "else", "while", "for",
@@ -17,7 +17,7 @@ std::string look_for_words[] = {
     "void"
 };
 
-#define LOOK_FOR_OPERATORS 1
+#define LOOK_FOR_OPERATORS      1
 // list of operators from compiler.hpp/Operator_Tokens
 std::string look_for_operators[] = {
     "+", "-", "*", "/", "=", "+=", "-=",
@@ -26,20 +26,20 @@ std::string look_for_operators[] = {
     "~", "<<", ">>", "%", "++", "--"
 };
 
-#define LOOK_FOR_SEPARATORS 2
+#define LOOK_FOR_SEPARATORS     2
 // list of separators from compiler.hpp/Separator_Tokens
 std::string look_for_separators[] = {
     "(", ")", "{", "}", "[", "]", ";", ",", ".", ":"
 };
 
 // Don't think these are needed for now
-// #define LOOK_FOR_PREPROCESSOR 3
+// #define LOOK_FOR_PREPROCESSOR    3
 // list of preprocessor from compiler.hpp/Preprocessor_Tokens
 // std::string look_for_preprocessor[] = {
 //     "import", "macro", "compiler"
 // };
 
-#define LOOK_FOR_LITERALS 4
+#define LOOK_FOR_LITERALS       4
 // list of literals from compiler.hpp/Literal_Tokens
 std::string look_for_literals[] = {
     "int", "string", "char", "float", "double", "bool"
@@ -151,19 +151,21 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
                         in_block_comment = true;
                         break;
                     } 
-                    else {
+                    else if (std::isalnum(next_char)){
                         // must check for division operator. can be optimized. not feeling like it now
                         int i_check_operators = if_arr_contains(LOOK_FOR_OPERATORS, buffer);
+                        std::cout << line[cur_ind] << std::endl;
                         if(i_check_operators != -1){
                             check_operators(i_check_operators, tokens, buffer);
                             buffer = "";
+                            cur_ind--; // Otherwise if (1/1) will be tokenized as (1, /,) and (1/12) will be tokenized as (1, /, 2)
                             continue;
                         }
                     } 
-                case 0x0A:
+                case mcr_WHITESPACE_NEWLINE:
                     tokens->push_back(Token(WHITESPACE, WHITESPACE_NEWLINE, "\n", line_num, line_pos));
                     break;
-                case 0x0D:
+                case mcr_WHITESPACE_RETURN:
                     tokens->push_back(Token(WHITESPACE, WHITESPACE_RETURN, "\r", line_num, line_pos));
                     break;
                 case '"': 
@@ -268,7 +270,12 @@ Type: 2 Subtype: 4 Value: )
                 int i_check_words = if_arr_contains(LOOK_FOR_WORDS, buffer);
                 // check for keywords
                 // 0x20 is space, 0x0A is newline, 0x0D is carriage return, 0x09 is tab
-                if(i_check_words != -1 && (look_next[0] == 0x20 || look_next[0] == 0x0A || look_next[0] == 0x0D || look_next[0] == 0x09)) {
+                if(i_check_words != -1 && 
+                (look_next[0] == mcr_WHITESPACE_SPACE 
+                || look_next[0] == mcr_WHITESPACE_NEWLINE 
+                || look_next[0] == mcr_WHITESPACE_RETURN
+                || look_next[0] == mcr_WHITESPACE_TAB)
+                ) {
                     check_keywords(i_check_words, tokens, buffer);
                     buffer = "";
                     continue;
@@ -301,8 +308,8 @@ Type: 2 Subtype: 4 Value: )
                 cur_ind--; // bad logic, will fix later
                 int check_operators_next = if_arr_contains(LOOK_FOR_OPERATORS, look_next);
                 int check_separators_next = if_arr_contains(LOOK_FOR_SEPARATORS, look_next);
-                if(look_next[0] == 0x20 || look_next[0] == 0x0A || 
-                    look_next[0] == 0x0D || look_next[0] == 0x09 ||
+                if(look_next[0] == mcr_WHITESPACE_SPACE || look_next[0] == mcr_WHITESPACE_NEWLINE || 
+                    look_next[0] == mcr_WHITESPACE_RETURN || look_next[0] == mcr_WHITESPACE_TAB ||
                     (buffer != "" && check_operators_next != -1 || check_separators_next != -1)
                     ){
                     // IDENTIFIER_UNKNOWN is a placeholder for now, explained in compiler.hpp
@@ -313,8 +320,10 @@ Type: 2 Subtype: 4 Value: )
                     continue;
                 }
 
-                // this has to made so that 1+1, i++ and so on can be tokenized
-                // will be fixed later for better version, seems to work for now
+                // I don't remember why I did these if statements, 
+                // I don't know if they are needed but don't want to find out
+                // //this has to made so that 1+1, i++ and so on can be tokenized
+                // //will be fixed later for better version, seems to work for now
                 if(check_operators_next != -1){
                     check_operators(check_operators_next, tokens, buffer);
                     buffer = "";

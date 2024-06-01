@@ -1,14 +1,64 @@
 #include "compiler.hpp"
-#include "glb/message.hpp"
+#include "./glb/message.hpp"
+#include "./funcs/funcs.hpp"
 #include <iostream>
+#include <memory>
 #include <vector>
 #include <string>
 
 Token look_ahead(std::vector<Token> &tokens, int &amount);
 Token look_behind(std::vector<Token> &tokens, int &amount);
 
+void print_parsed_function(const std::shared_ptr<Parsed_common_function>& parsed_function);
+
+// Function to print a Parse_Factor
+void print_factor(const Parse_Factor& factor) {
+    if (factor.type == Expression_Types::Literal) {
+        std::cout << "Factor (Literal): " << factor.value << std::endl;
+    } else if (factor.type == Expression_Types::Expression && factor.subexpression) {
+        std::cout << "Factor (Subexpression):" << std::endl;
+        print_parsed_function(std::make_shared<Parsed_common_function>("subexpression", std::vector<std::shared_ptr<Parse_Expression>>{factor.subexpression}));
+    }
+}
+
+// Function to print a Parse_Term
+void print_term(const Parse_Term& term) {
+    for (size_t i = 0; i < term.factors.size(); ++i) {
+        print_factor(term.factors[i]);
+        if (i < term.operators.size()) {
+            std::cout << "Operator: " << term.operators[i] << std::endl;
+        }
+    }
+}
+
+// Function to print a Parse_Expression
+void print_expression(const Parse_Expression& expression) {
+    for (size_t i = 0; i < expression.terms.size(); ++i) {
+        print_term(expression.terms[i]);
+        if (i < expression.operators.size()) {
+            std::cout << "Operator: " << expression.operators[i] << std::endl;
+        }
+    }
+}
+
+// Function to print a Parsed_common_function
+void print_parsed_function(const std::shared_ptr<Parsed_common_function>& parsed_function) {
+    std::cout << "Function name: " << parsed_function->name << std::endl;
+    for (const auto& arg : parsed_function->args) {
+        print_expression(*arg);
+    }
+}
 void syntaxanalysis(std::vector<Token> &tokens) {
     std::vector<Parse_Expression> parsetree;
+
+    size_t cur_inda = 0;
+    for(size_t i = 0; i < tokens.size(); i++){
+        std::cout << "Type: '" << tokens[i].type << "' Subtype: '" << tokens[i].subtype << "' Value: '" << tokens[i].value << "'" << std::endl;
+    }
+    std::shared_ptr<Parsed_common_function> exits = parse_common_function(tokens, cur_inda);
+    print_parsed_function(exits);
+    exit(1111);
+
     for(size_t cur_ind = 0; cur_ind < tokens.size(); cur_ind++){
         // std::cout << "Type: '" << tokens[cur_ind].type << "' Subtype: '" << tokens[cur_ind].subtype << "' Value: '" << tokens[cur_ind].value << "'" << std::endl;
         switch (tokens[cur_ind].type){

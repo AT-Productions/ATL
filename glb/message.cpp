@@ -68,6 +68,9 @@ OPTIONS:\n\
     case UNKNOWN_TOKEN:
         s_message = "Unknown token at compiler3.";
         break;
+    case INVALID_ARGUMENT_PARSER:
+        s_message = "Invalid argument in factor parser.";
+        break;
     default:    
         s_message = "Unknown error.";
         break;
