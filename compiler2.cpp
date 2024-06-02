@@ -299,15 +299,26 @@ Type: 2 Subtype: 4 Value: )
                 
                 if(std::isdigit(line[cur_ind]) && buffer.size() == 1 && std::isdigit(buffer[0])){
                     curr_char = '\0';
-                    while(std::isdigit(curr_char = look_ahead(cur_ind, line)[0]) || curr_char== '.'){
+                    while(std::isdigit(curr_char = look_ahead(cur_ind, line)[0]) 
+                        || curr_char== '.'      // for floating point numbers
+                        || curr_char == 'e'     // for scientific notation
+                        || curr_char == 'x'     // for hexadecimal numbers
+                        ){
                         buffer += line[cur_ind];
                     }
                     // TODO test this decriment
                     // -- propably works
                     cur_ind--;
-                    if(buffer.find('.') == std::string::npos){
+                    if(buffer.find('e') != std::string::npos){
+                        tokens->push_back(Token(LITERAL, FLOAT_LITERAL, buffer, line_num, line_pos));
+                    }
+                    else if(buffer.find('x') != std::string::npos){
+                        tokens->push_back(Token(LITERAL, HEX_LITERAL, buffer, line_num, line_pos));
+                    }
+                    else if(buffer.find('.') == std::string::npos){
                         tokens->push_back(Token(LITERAL, INT_LITERAL, buffer, line_num, line_pos));
-                    } else {
+                    }
+                    else {
                         tokens->push_back(Token(LITERAL, FLOAT_LITERAL, buffer, line_num, line_pos));
                     }
                     buffer = "";

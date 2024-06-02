@@ -121,7 +121,8 @@ enum Literal_Tokens {
     STRING_LITERAL,         // "string"
     CHAR_LITERAL,           // 'c'
     BOOL_LITERAL,           // true, false
-    VOID_LITERAL            // void
+    VOID_LITERAL,           // void
+    HEX_LITERAL,            // 0x1
 };
 
 // Identifier names are stored in the value field
@@ -140,6 +141,8 @@ enum Identifier_Tokens {
     IDENTIFIER_FUNC_DECL,   // function declaration
     IDENTIFIER_VAR_DECL,    // variable declaration
     IDENTIFIER_VAR_ASSIGN,  // variable assignment
+    IDENTIFIER_IMPORT,      // include | import
+    IDENTIFIER_ARGUMENT,    // argument
 };
 
 enum Comment_Tokens {
