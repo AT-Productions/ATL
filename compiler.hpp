@@ -184,10 +184,11 @@ void syntaxanalysis(std::vector<Token> &tokens);
 
 enum class Expression_Types {
     Literal,
-    Operator,
-    Expression,
-    Term,
-    Factor
+    Identifier, // Variable
+    Operator, // Operator
+    Expression, // Subexpression
+    Term, // Term
+    Factor // Factor
 };
 /*+++
 Parser structs in order of appearance -
@@ -202,7 +203,7 @@ struct Parse_Factor {
     std::string value;
     std::shared_ptr<struct Parse_Expression> subexpression; // Optional subexpression
 
-    // Constructor for literals
+    // Constructor for literals (numbers and strings)
     Parse_Factor(Expression_Types t, std::string val, std::shared_ptr<Parse_Expression> subexpr = nullptr) 
         : type(t), value(val), subexpression(subexpr) {}
 

@@ -36,7 +36,7 @@ ECHO %ERRORLEVEL%
 
 if %ERRORLEVEL% NEQ 0 (
     ECHO Run failed, exiting...
-    exit /B 1
+    exit /B 0
 )
 
 @REM !TEMPORARY

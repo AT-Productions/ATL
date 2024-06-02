@@ -122,6 +122,8 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
             line_pos++;
             buffer += line[cur_ind];
             ltrim(buffer); // remove leading whitespace, don't see any issues for now :))))))))
+            // EXPERIMENTAL
+            // trim(buffer); // remove leading and trailing whitespace
             if(in_block_comment){
                 if(buffer[buffer.length()-2] == '*' && buffer[buffer.length()-1] == '/'){
                     in_block_comment = false;
@@ -133,8 +135,9 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
             switch (line[cur_ind]){
                 case '/':
                     next_char = look_ahead(cur_ind, line)[0];
+                    cur_ind--;
                     if(next_char == '/'){
-                        buffer += '/';
+                        // buffer += '/';
                         while(true){
                             buffer += look_ahead(cur_ind, line)[0];
                             if(line.length() < cur_ind){
@@ -147,21 +150,20 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
                     } 
                     else if (next_char == '*'){
                         // Start of block comment
-                        buffer += '*';
+                        // buffer += '*';
                         in_block_comment = true;
                         break;
-                    } 
-                    else if (std::isalnum(next_char)){
+                    }
+                    else {
                         // must check for division operator. can be optimized. not feeling like it now
                         int i_check_operators = if_arr_contains(LOOK_FOR_OPERATORS, buffer);
-                        std::cout << line[cur_ind] << std::endl;
                         if(i_check_operators != -1){
                             check_operators(i_check_operators, tokens, buffer);
                             buffer = "";
-                            cur_ind--; // Otherwise if (1/1) will be tokenized as (1, /,) and (1/12) will be tokenized as (1, /, 2)
                             continue;
                         }
-                    } 
+                    }
+                    break;
                 case mcr_WHITESPACE_NEWLINE:
                     tokens->push_back(Token(WHITESPACE, WHITESPACE_NEWLINE, "\n", line_num, line_pos));
                     break;
@@ -270,12 +272,8 @@ Type: 2 Subtype: 4 Value: )
                 int i_check_words = if_arr_contains(LOOK_FOR_WORDS, buffer);
                 // check for keywords
                 // 0x20 is space, 0x0A is newline, 0x0D is carriage return, 0x09 is tab
-                if(i_check_words != -1 && 
-                (look_next[0] == mcr_WHITESPACE_SPACE 
-                || look_next[0] == mcr_WHITESPACE_NEWLINE 
-                || look_next[0] == mcr_WHITESPACE_RETURN
-                || look_next[0] == mcr_WHITESPACE_TAB)
-                ) {
+                if(i_check_words != -1)
+                {
                     check_keywords(i_check_words, tokens, buffer);
                     buffer = "";
                     continue;
