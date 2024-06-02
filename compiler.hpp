@@ -57,7 +57,7 @@ enum Keyword_Tokens {
     KEYWORD_VOID            // void
 
     /*
-    ADD:
+    TODO ADD:
     KEYWORD_BREAK
     KEYWORD_CONTINUE
     KEYWORD_SWITCH
@@ -96,7 +96,10 @@ enum Operator_Tokens {
     RSHIFT,                 // >>
     MOD,                    // %
     INC,                    // ++
-    DEC                     // --
+    DEC,                    // --
+    MUL_ASSIGN,             // *=
+    DIV_ASSIGN,             // /=
+    MOD_ASSIGN,             // %=
 };
 
 enum Separator_Tokens {
@@ -117,7 +120,8 @@ enum Literal_Tokens {
     FLOAT_LITERAL,          // 1.0 
     STRING_LITERAL,         // "string"
     CHAR_LITERAL,           // 'c'
-    BOOL_LITERAL            // true, false
+    BOOL_LITERAL,           // true, false
+    VOID_LITERAL            // void
 };
 
 // Identifier names are stored in the value field
@@ -130,14 +134,20 @@ enum Identifier_Tokens {
     IDENTIFIER_ENUM,        // enum
     IDENTIFIER_MACRO,       // macro
     IDENTIFIER_COMPILER,    // compiler
-    IDENTIFIER_UNKNOWN      // unknown, i'll use this in lexanalysis. 
+    IDENTIFIER_UNKNOWN,     // unknown, i'll use this in lexanalysis. 
     //i can't know if it is a variable or a function before syntaxanalysis 
+    IDENTIFIER_FUNC_CALL,   // function call
+    IDENTIFIER_FUNC_DECL,   // function declaration
+    IDENTIFIER_VAR_DECL,    // variable declaration
+    IDENTIFIER_VAR_ASSIGN,  // variable assignment
 };
 
 enum Comment_Tokens {
     LINE_COMMENT,           // //
     BLOCK_COMMENT           // /* */
 };
+
+
 
 /*+++
 Preprocessor_Tokens is not used in the lexer -
@@ -175,6 +185,7 @@ struct Token {
 
 std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments);
 
+void IDENTIFIER_UNKNOWN_fix(std::vector<Token> &tokens);
 
 /*+++
 Syntax analysis and parser struct and enums

@@ -23,7 +23,8 @@ std::string look_for_operators[] = {
     "+", "-", "*", "/", "=", "+=", "-=",
     "==", "!=", ">", "<", ">=", "<=",
     "&&", "||", "!", "&", "|", "^",
-    "~", "<<", ">>", "%", "++", "--"
+    "~", "<<", ">>", "%", "++", "--",
+    "*=", "/=", "%=" // TODO TEST
 };
 
 #define LOOK_FOR_SEPARATORS     2
@@ -155,12 +156,21 @@ std::vector<Token>* lexanalysis(std::vector<std::string> &s_arguments) {
                         break;
                     }
                     else {
-                        // must check for division operator. can be optimized. not feeling like it now
-                        int i_check_operators = if_arr_contains(LOOK_FOR_OPERATORS, buffer);
-                        if(i_check_operators != -1){
-                            check_operators(i_check_operators, tokens, buffer);
+                        // is not good, will fix later
+                        if(next_char == '='){
+                            buffer += '=';
+                            tokens->push_back(Token(OPERATOR, DIV_ASSIGN, buffer, line_num, line_pos));
                             buffer = "";
+                            cur_ind++;
                             continue;
+                        } else {
+                            // must check for division operator. can be optimized. not feeling like it now
+                            int i_check_operators = if_arr_contains(LOOK_FOR_OPERATORS, buffer);
+                            if(i_check_operators != -1){
+                                check_operators(i_check_operators, tokens, buffer);
+                                buffer = "";
+                                continue;
+                            }
                         }
                     }
                     break;
@@ -249,6 +259,7 @@ Type: 2 Subtype: 4 Value: )
                     buffer = "";
                     continue;
                 }
+
                 int i_check_operators = if_arr_contains(LOOK_FOR_OPERATORS, buffer);
                 if(i_check_operators != -1){
                     /*+++
@@ -269,6 +280,7 @@ Type: 2 Subtype: 4 Value: )
                     buffer = "";
                     continue;
                 }
+                
                 int i_check_words = if_arr_contains(LOOK_FOR_WORDS, buffer);
                 // check for keywords
                 // 0x20 is space, 0x0A is newline, 0x0D is carriage return, 0x09 is tab
@@ -285,7 +297,7 @@ Type: 2 Subtype: 4 Value: )
                 //     continue;
                 // }
                 
-                if(std::isdigit(line[cur_ind])){
+                if(std::isdigit(line[cur_ind]) && buffer.size() == 1 && std::isdigit(buffer[0])){
                     curr_char = '\0';
                     while(std::isdigit(curr_char = look_ahead(cur_ind, line)[0]) || curr_char== '.'){
                         buffer += line[cur_ind];
@@ -404,6 +416,9 @@ void check_operators(int x, std::vector<Token> *tokens, std::string &buffer) {
         case 22: tokens->push_back(Token(OPERATOR, MOD, buffer, line_num, line_pos)); break;
         case 23: tokens->push_back(Token(OPERATOR, INC, buffer, line_num, line_pos)); break;
         case 24: tokens->push_back(Token(OPERATOR, DEC, buffer, line_num, line_pos)); break;
+        case 25: tokens->push_back(Token(OPERATOR, MUL_ASSIGN, buffer, line_num, line_pos)); break;
+        case 26: tokens->push_back(Token(OPERATOR, DIV_ASSIGN, buffer, line_num, line_pos)); break;
+        case 27: tokens->push_back(Token(OPERATOR, MOD_ASSIGN, buffer, line_num, line_pos)); break;
         default: 
         message(TOKENIZER_SYNTAX, FL_compiler2, 
         "check_operators '" + buffer + "' at row: " 

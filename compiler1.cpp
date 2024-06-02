@@ -68,6 +68,18 @@ int main(int argc, char* argv[]){
 
     // compiler2.cpp
     std::vector<Token> *tokens = lexanalysis(s_arguments);
+    for(auto &token : *tokens){
+        std::cout << "Type: " << token.type << " Subtype: " 
+        << token.subtype << " Value: " << token.value << "\n";
+    }
+    std::cout << "============================\n";
+    // compiler2.5-3.cpp
+    IDENTIFIER_UNKNOWN_fix(*tokens);
+    for(auto &token : *tokens){
+        std::cout << "Type: " << token.type << " Subtype: " 
+        << token.subtype << " Value: " << token.value << "\n";
+    }
+    exit(0);
     // compiler3.cpp
     syntaxanalysis(*tokens);
     

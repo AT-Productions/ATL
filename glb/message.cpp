@@ -71,6 +71,9 @@ OPTIONS:\n\
     case INVALID_ARGUMENT_PARSER:
         s_message = "Invalid argument in factor parser.";
         break;
+    case UNKNOW_IDENTIFIER:
+        s_message = "Unknown identifier.";
+        break;
     default:    
         s_message = "Unknown error.";
         break;

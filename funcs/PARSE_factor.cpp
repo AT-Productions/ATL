@@ -7,10 +7,17 @@
 // 1. Parse factor
 
 std::shared_ptr<Parse_Factor> parse_factor(std::vector<Token> &tokens, size_t& index) {
+    std::cout << "String or char literal: " << tokens[index].value << std::endl;
     if (tokens[index].type == Tokens::LITERAL && 
         (tokens[index].subtype == Literal_Tokens::INT_LITERAL ||
         tokens[index].subtype == Literal_Tokens::FLOAT_LITERAL))
     {
+        return std::make_shared<Parse_Factor>(Expression_Types::Literal, tokens[index++].value);
+    } 
+    else if(tokens[index].type == Tokens::LITERAL && (
+        tokens[index].subtype == Literal_Tokens::STRING_LITERAL ||
+        tokens[index].subtype == Literal_Tokens::CHAR_LITERAL
+    )) {
         return std::make_shared<Parse_Factor>(Expression_Types::Literal, tokens[index++].value);
     } 
     else if (tokens[index].type == Tokens::SEPARATOR && 
