@@ -23,6 +23,11 @@ file(GLOB SOURCES
 # Add executable and link with ATL library
 add_executable (ATL ${SOURCES})
 
+# Define DEBUG macro
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  target_compile_definitions(ATL PRIVATE DEBUG=1)
+endif()
+
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ATL PROPERTY CXX_STANDARD 20)
 endif()

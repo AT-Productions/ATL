@@ -30,9 +30,11 @@ void syntaxanalysis(std::vector<Token> &tokens) {
     std::vector<std::shared_ptr<Parsed_Token>> parsetree;
 
     size_t cur_inda = 0;
+#ifdef DEBUG
     for(size_t i = 0; i < tokens.size(); i++){
         std::cout << "Type: '" << tokens[i].type << "' Subtype: '" << tokens[i].subtype << "' Value: '" << tokens[i].value << "'" << std::endl;
     }
+#endif
 
 
     for(size_t cur_ind = 0; cur_ind < tokens.size(); cur_ind++){

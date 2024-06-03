@@ -37,16 +37,16 @@ it can be atleast:
     - variable declaration          # // DONE
     - variable assignment           # // DONE
     - function call                 # // DONE
-    - macro definition              # // TODO: PLACE AT FIRST IF
-    - import statement              # // TODO: PLACE AT FIRST IF
-    - compiler directive            # // TODO: PLACE AT FIRST IF
-    - struct declaration            # // TODO: PLACE AT FIRST IF
-    - enum declaration              # // TODO: PLACE AT FIRST IF
-    - function argument name        # // TODO: PLACE AT ELSE
+    - macro definition              # // DONE
+    - import statement              # // DONE
+    - compiler directive            # // DONE
+    - struct declaration            # // DONE
+    - enum declaration              # // DONE
+    - function argument name        # // DONE
 
 syntax:
     Function declaration:
-        <identifier> <identifier> (<identifier> <identifier> <identifier> ... <identifier>)
+        <keyword> <identifier> (<identifier> <identifier> <identifier> ... <identifier>)
     Function call: 
         <identifier>
         <identifier>()
@@ -88,6 +88,7 @@ void IDENTIFIER_UNKNOWN_fix(std::vector<Token> &tokens){
             tokens[i].subtype != IDENTIFIER_UNKNOWN) continue;
         if(i - 1 < 0 || i + 1 >= tokens.size()) continue; // TODO: What if the first token is an unknown identifier or parenthesisless function call?
         
+#ifdef DEBUG
         std::cout << "UNKNOWN IDENTIFIER: " << tokens[i].value << " INFO: " << 
         tokens[i+1].type << " "
         << tokens[i+1].subtype << " " << 
@@ -95,8 +96,9 @@ void IDENTIFIER_UNKNOWN_fix(std::vector<Token> &tokens){
         " <=== next | previous ===>"  <<
         tokens[i-1].type << " "
         << tokens[i-1].subtype << " " << 
-        tokens[i-1].value << std::endl;
-        
+        tokens[i-1].value << std::endl;  
+#endif
+
         // For declarations such as
         // function, variable, struct, enum, etc.
         if(tokens[i-1].type == Tokens::KEYWORD){
@@ -257,19 +259,10 @@ void IDENTIFIER_UNKNOWN_fix(std::vector<Token> &tokens){
             } 
             else if(
                 // Argument names in function calls
-                // TODO: Only support for basic types, add more?
                    tokens[i-1].type == Tokens::SEPARATOR
                 && tokens[i-1].subtype == Separator_Tokens::COMMA
                 || tokens[i-1].subtype == Separator_Tokens::LPAREN
-
-                // && tokens[i-1].type == Tokens::KEYWORD
-                // && tokens[i-1].subtype == KEYWORD_INT
-                // || tokens[i-1].subtype == KEYWORD_FLOAT
-                // || tokens[i-1].subtype == KEYWORD_CHAR
-                // || tokens[i-1].subtype == KEYWORD_BOOL
-                // || tokens[i-1].subtype == KEYWORD_STRING
-
-                // Check for (string test) or (int test, int test2, ...)
+                // Check for (test) or (test, test2, ...)
                 && tokens[i+1].type == Tokens::SEPARATOR
                 && tokens[i+1].subtype == Separator_Tokens::COMMA
                 || tokens[i+1].subtype == Separator_Tokens::RPAREN
