@@ -12,7 +12,7 @@
 
 #define FL_compiler253          9
 
-#define FL_parse_term           9
+#define FL_parse_term           10
 
 #define NO_ARGUMENTS            1
 #define HELP                    2

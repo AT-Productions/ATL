@@ -1,8 +1,2 @@
-void hello(){}
-hello
+exit(10+(1*2))
 
-int test1 = 10
-
-test1= 15
-
-//string a = "lol" + " test"

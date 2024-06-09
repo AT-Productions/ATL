@@ -83,11 +83,14 @@ int main(int argc, char* argv[]){
         std::cout << "Type: " << token.type << " Subtype: " 
         << token.subtype << " Value: " << token.value << "\n";
     }
+    std::cout << "============INTO3===========\n";
 #endif
-    exit(0);
+    // exit(0);
     // compiler3.cpp
     syntaxanalysis(*tokens);
-    
+#ifdef DEBUG
+    std::cout << "============INTO4===========\n";
+#endif
     delete tokens;
     tokens = nullptr;
     exit(0);
